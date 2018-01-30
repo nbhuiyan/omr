@@ -32,8 +32,13 @@
 #include "runtime/CodeCacheTypes.hpp"
 #include "env/RawAllocator.hpp"
 
+#include "codegen/StaticRelocation.hpp"
+#include "codegen/ELFRelocationResolver.hpp"
+
 class TR_FrontEnd;
 class TR_OpaqueMethodBlock;
+class TR_Memory;
+namespace OMR{ class ELFGenerator; }
 namespace TR { class CodeCache; }
 namespace TR { class CodeCacheManager; }
 namespace TR { class CodeCacheMemorySegment; }
@@ -69,29 +74,6 @@ typedef Elf32_Sym ELFSymbol;
 #endif
 
 namespace OMR {
-struct ELFCodeCacheHeader
-   {
-   ELFHeader hdr;
-   ELFProgramHeader phdr;
-   };
-
-struct ELFCodeCacheTrailer
-   {
-   ELFSectionHeader zeroSection;
-   ELFSectionHeader textSection;
-   ELFSectionHeader dynsymSection;
-   ELFSectionHeader shstrtabSection;
-   ELFSectionHeader dynstrSection;
-
-   char zeroSectionName[1];
-   char shstrtabSectionName[10];
-   char textSectionName[6];
-   char dynsymSectionName[8];
-   char dynstrSectionName[8];
-
-   // start of a variable sized region: an ELFSymbol structure per symbol + total size of elf symbol names
-   ELFSymbol symbols[1];
-   };
 
 // structure used to track regions of code cache that will become symbols
 typedef struct CodeCacheSymbol
@@ -102,6 +84,28 @@ typedef struct CodeCacheSymbol
    uint32_t _size;
    struct CodeCacheSymbol *_next;
    } CodeCacheSymbol;
+
+typedef struct CodeCacheSymbolContainer{
+    CodeCacheSymbol *_head;
+    CodeCacheSymbol *_tail;
+    uint32_t _numSymbols;
+    uint32_t _totalSymbolNameLength;
+} CodeCacheSymbolContainer;
+
+typedef struct CodeCacheRelocationInfo
+      {
+      uint8_t *_location;
+      uint32_t _type;
+      uint32_t _symbol;
+      struct CodeCacheRelocationInfo *_next;
+      }CodeCacheRelocationInfo;
+
+typedef struct CodeCacheRelocationInfoContainer{
+      CodeCacheRelocationInfo *_head;
+      CodeCacheRelocationInfo *_tail;
+      uint32_t _numRelocations;
+}CodeCacheRelocationInfoContainer;
+
 } // namespace OMR
 
 #endif // HOST_OS == OMR_LINUX
@@ -264,21 +268,22 @@ protected:
 
 #if (HOST_OS == OMR_LINUX)
    public:
-   void initializeObjectFileGenerator();
-   void initializeELFHeader();
-   void initializeELFTrailer();
-   void initializeELFHeaderForPlatform(ELFCodeCacheHeader *hdr);
+   void initializeRelocatableELFGenerator();
+   void initializeELFGenerator();
 
    protected:
-   TR::ELFObjectFileGenerator    *_objectFileGenerator;
-   struct ELFCodeCacheHeader     *_elfHeader;
-   struct ELFCodeCacheTrailer    *_elfTrailer;
-   uint32_t                       _elfTrailerSize;
+
+   ELFGenerator              *_elfGenerator;
+   ELFGenerator              *_elfRelocatableGenerator;
 
    // collect information on code cache symbols here, will be post processed into the elf trailer structure
-   static CodeCacheSymbol        *_symbols;
-   static uint32_t                _numELFSymbols;
-   static uint32_t                _totalELFSymbolNamesLength;
+   static CodeCacheSymbolContainer   *_symbolContainer;
+   static CodeCacheSymbolContainer   *_relocatableSymbolContainer;
+   static CodeCacheRelocationInfoContainer *_relocations;
+   TR::ELFRelocationResolver          _resolver;
+   const char *                       _objectFileName;
+
+
 #endif // HOST_OS == OMR_LINUX
    };
 
