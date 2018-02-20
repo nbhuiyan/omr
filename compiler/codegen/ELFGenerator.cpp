@@ -31,70 +31,67 @@
 #include "control/Options_inlines.hpp"
 #include "runtime/CodeCacheManager.hpp"
 
+
 TR::ELFExecutableGenerator::ELFExecutableGenerator(TR::RawAllocator rawAllocator,
                             uint8_t const * codeStart, size_t codeSize):
-                            ELFGenerator(rawAllocator),
-                            _codeStart(codeStart),
-                            _codeSize(codeSize),
-                            _trailerStructSize(sizeof(ELFTrailer))
+                            ELFGenerator(rawAllocator, codeStart, codeSize)
                             {
                                 initialize();
                             }
 
 TR::ELFRelocatableGenerator::ELFRelocatableGenerator(TR::RawAllocator rawAllocator,
                             uint8_t const * codeStart, size_t codeSize):
-                            ELFGenerator(rawAllocator),
-                            _codeStart(codeStart),
-                            _codeSize(codeSize),
-                            _trailerStructSize(sizeof(ELFTrailer))
+                            ELFGenerator(rawAllocator, codeStart, codeSize)
                             {
                                 initialize();
                             }
 
 void
-TR::ELFGenerator::initializeELFHeaderForPlatform(ELFEHeader *hdr){
-    hdr->e_ident[EI_MAG0] = ELFMAG0;
-    hdr->e_ident[EI_MAG1] = ELFMAG1;
-    hdr->e_ident[EI_MAG2] = ELFMAG2;
-    hdr->e_ident[EI_MAG3] = ELFMAG3;
-    hdr->e_ident[EI_CLASS] = ELFClass;
-    hdr->e_ident[EI_VERSION] = EV_CURRENT;
+TR::ELFGenerator::initializeELFHeaderForPlatform(void){
+    _header->e_ident[EI_MAG0] = ELFMAG0;
+    _header->e_ident[EI_MAG1] = ELFMAG1;
+    _header->e_ident[EI_MAG2] = ELFMAG2;
+    _header->e_ident[EI_MAG3] = ELFMAG3;
+    _header->e_ident[EI_CLASS] = ELFClass;
+    _header->e_ident[EI_VERSION] = EV_CURRENT;
+    _header->e_ident[EI_ABIVERSION] = 0;
+    _header->e_ident[EI_DATA] = TR::Compiler->target.cpu.isLittleEndian() ? ELFDATA2LSB : ELFDATA2MSB;
+    
     for (auto b = EI_PAD;b < EI_NIDENT;b++)
-        hdr->e_ident[b] = 0;
+        _header->e_ident[b] = 0;
 
-    //platform specific inititializations
+    #if defined(LINUX)
+        _header->e_ident[EI_OSABI] = ELFOSABI_LINUX;
+    #elif defined(AIXPPC)
+        _header->e_ident[EI_OSABI] = ELFOSABI_AIX;
+    #else
+        TR_ASSERT(0, "unrecognized operating system: ELF header cannot be initialized");
+    #endif
+    
     #if defined(TR_TARGET_X86)
-        hdr->e_machine = EM_386;
+        _header->e_machine = EM_386;
     #elif defined(TR_TARGET_POWER)
         #if defined(TR_TARGET_64BIT)
-            hdr->e_machine = EM_PPC64;
+            _header->e_machine = EM_PPC64;
         #else
-            hdr->e_machine = EM_PPC;
+            _header->e_machine = EM_PPC;
         #endif
     #elif (TR_TARGET_S390)
-        hdr->e_machine = EM_S390;
+        _header->e_machine = EM_S390;
     #else
         TR_ASSERT(0, "unrecognized architecture: ELF header cannot be initialized");
     #endif
 
-    #if defined(LINUX)
-        hdr->e_ident[EI_OSABI] = ELFOSABI_LINUX;
-    #elif defined(AIXPPC)
-        hdr->e_ident[EI_OSABI] = ELFOSABI_AIX;
-    #else
-        TR_ASSERT(0, "unrecognized operating system: ELF header cannot be initialized");
-    #endif
-   
-    hdr->e_ident[EI_ABIVERSION] = 0;
-    hdr->e_ident[EI_DATA] = TR::Compiler->target.cpu.isLittleEndian() ? ELFDATA2LSB : ELFDATA2MSB;
-    hdr->e_version = EV_CURRENT;
-    hdr->e_flags = 0;
-    hdr->e_ehsize = sizeof(ELFEHeader);
-    hdr->e_shentsize = sizeof(ELFSectionHeader);
+    _header->e_version = EV_CURRENT;
+    _header->e_flags = 0; //processor-specific flags associatiated with the file
+    _header->e_ehsize = sizeof(ELFEHeader);
+    _header->e_shentsize = sizeof(ELFSectionHeader);
 }
 
 void 
-TR::ELFGenerator::initializeELFTrailerZeroSection(ELFSectionHeader *shdr){
+TR::ELFGenerator::initializeZeroSection(){
+    ELFSectionHeader * shdr = static_cast<ELFSectionHeader *>(_rawAllocator.allocate(sizeof(ELFSectionHeader)));
+    
     shdr->sh_name = 0;
     shdr->sh_type = 0;
     shdr->sh_flags = 0;
@@ -105,11 +102,17 @@ TR::ELFGenerator::initializeELFTrailerZeroSection(ELFSectionHeader *shdr){
     shdr->sh_info = 0;
     shdr->sh_addralign = 0;
     shdr->sh_entsize = 0;
+
+    _zeroSection = shdr;
+    _zeroSectionName[0] = 0;
 }
     
 void 
-TR::ELFGenerator::initializeELFTrailerTextSection(ELFSectionHeader *shdr, uint32_t shName, ELFAddress shAddress,
+TR::ELFGenerator::initializeTextSection(uint32_t shName, ELFAddress shAddress,
                                                  ELFOffset shOffset, uint32_t shSize){
+
+    ELFSectionHeader * shdr = static_cast<ELFSectionHeader *>(_rawAllocator.allocate(sizeof(ELFSectionHeader)));
+    
     shdr->sh_name = shName;
     shdr->sh_type = SHT_PROGBITS;
     shdr->sh_flags = SHF_ALLOC | SHF_EXECINSTR;
@@ -121,10 +124,15 @@ TR::ELFGenerator::initializeELFTrailerTextSection(ELFSectionHeader *shdr, uint32
     shdr->sh_addralign = 32;
     shdr->sh_entsize = 0;
 
+    _textSection = shdr;
+    strcpy(_textSectionName, ".text");
 }
     
 void
-TR::ELFGenerator::initializeELfTrailerDynSymSection(ELFSectionHeader *shdr, uint32_t shName, ELFOffset shOffset, uint32_t shSize, uint32_t shLink){
+TR::ELFGenerator::initializeDynSymSection(uint32_t shName, ELFOffset shOffset, uint32_t shSize, uint32_t shLink){
+    
+    ELFSectionHeader * shdr = static_cast<ELFSectionHeader *>(_rawAllocator.allocate(sizeof(ELFSectionHeader)));
+
     shdr->sh_name = shName;
     shdr->sh_type = SHT_SYMTAB; // SHT_DYNSYM
     shdr->sh_flags = 0; //SHF_ALLOC;
@@ -135,10 +143,16 @@ TR::ELFGenerator::initializeELfTrailerDynSymSection(ELFSectionHeader *shdr, uint
     shdr->sh_info = 1; // index of first non-local symbol: for now all symbols are global
     shdr->sh_addralign = 8;
     shdr->sh_entsize = sizeof(ELFSymbol);
+
+    _dynSymSection = shdr;
+    strcpy(_dynSymSectionName, ".symtab");
 }
 
 void
-TR::ELFGenerator::initializeELFTrailerStrTabSection(ELFSectionHeader *shdr, uint32_t shName, ELFOffset shOffset, uint32_t shSize){
+TR::ELFGenerator::initializeStrTabSection(uint32_t shName, ELFOffset shOffset, uint32_t shSize){
+    
+    ELFSectionHeader * shdr = static_cast<ELFSectionHeader *>(_rawAllocator.allocate(sizeof(ELFSectionHeader)));
+    
     shdr->sh_name = shName;
     shdr->sh_type = SHT_STRTAB;
     shdr->sh_flags = 0;
@@ -149,10 +163,16 @@ TR::ELFGenerator::initializeELFTrailerStrTabSection(ELFSectionHeader *shdr, uint
     shdr->sh_info = 0;
     shdr->sh_addralign = 1;
     shdr->sh_entsize = 0;
+
+    _shStrTabSection = shdr;
+    strcpy(_shStrTabSectionName, ".shstrtab");
 }
 
 void
-TR::ELFGenerator::initializeELFTrailerDynStrSection(ELFSectionHeader *shdr, uint32_t shName, ELFOffset shOffset, uint32_t shSize){
+TR::ELFGenerator::initializeDynStrSection(uint32_t shName, ELFOffset shOffset, uint32_t shSize){
+
+    ELFSectionHeader * shdr = static_cast<ELFSectionHeader *>(_rawAllocator.allocate(sizeof(ELFSectionHeader)));
+
     shdr->sh_name = shName;
     shdr->sh_type = SHT_STRTAB;
     shdr->sh_flags = 0;
@@ -163,6 +183,99 @@ TR::ELFGenerator::initializeELFTrailerDynStrSection(ELFSectionHeader *shdr, uint
     shdr->sh_info = 0;
     shdr->sh_addralign = 1;
     shdr->sh_entsize = 0;
+
+    _dynStrSection = shdr;
+    strcpy(_dynStrSectionName, ".symtab");
+}
+
+void
+TR::ELFGenerator::initializeRelaSection(uint32_t shName, ELFOffset shOffset, uint32_t shSize){
+
+    ELFSectionHeader * shdr = static_cast<ELFSectionHeader *>(_rawAllocator.allocate(sizeof(ELFSectionHeader)));
+
+    shdr->sh_name = shName;
+    shdr->sh_type = SHT_RELA;
+    shdr->sh_flags = 0;
+    shdr->sh_addr = 0;
+    shdr->sh_offset = shOffset;
+    shdr->sh_size = shSize;
+    shdr->sh_link = 3; // dynsymSection index in the elf file
+    shdr->sh_info = 1;
+    shdr->sh_addralign = 8;
+    shdr->sh_entsize = sizeof(ELFRela);
+
+    _relaSection = shdr;
+    strcpy(_relaSectionName, ".rela.text");
+
+}
+
+void
+TR::ELFGenerator::buildELFFile(::FILE *elfFile){
+    
+    writeHeaderToFile(elfFile);
+    if(_programHeader){
+        writeProgramHeaderToFile(elfFile);
+    }
+    writeCodeSegmentToFile(elfFile);
+
+    writeSectionHeaderToFile(elfFile, _zeroSection);
+    writeSectionHeaderToFile(elfFile, _textSection);
+    if(_relocations){
+        writeSectionHeaderToFile(elfFile, _relaSection);
+    }
+    writeSectionHeaderToFile(elfFile, _dynSymSection);
+    writeSectionHeaderToFile(elfFile, _shStrTabSection);
+    writeSectionHeaderToFile(elfFile, _dynStrSection);
+    
+    writeSectionNameToFile(elfFile, _zeroSectionName, sizeof(_zeroSectionName));
+    writeSectionNameToFile(elfFile, _textSectionName, sizeof(_textSectionName));
+    if(_relocations){
+        writeSectionNameToFile(elfFile, _relaSectionName, sizeof(_relaSectionName));
+    }
+    writeSectionNameToFile(elfFile, _dynSymSectionName, sizeof(_dynSymSectionName));
+    writeSectionNameToFile(elfFile, _shStrTabSectionName, sizeof(_shStrTabSectionName));
+    writeSectionNameToFile(elfFile, _dynStrSectionName, sizeof(_dynStrSectionName));
+    
+    writeELFSymbolsToFile(elfFile);
+    if(_relocations){
+        writeRelaEntriesToFile(elfFile);
+    }
+}
+
+
+void
+TR::ELFGenerator::writeHeaderToFile(::FILE *fp){
+    fwrite(_header, sizeof(uint8_t), sizeof(ELFEHeader), fp);
+}
+
+void 
+TR::ELFGenerator::writeProgramHeaderToFile(::FILE *fp){
+    fwrite(_programHeader, sizeof(uint8_t), sizeof(ELFProgramHeader), fp);
+}
+
+void 
+TR::ELFGenerator::writeSectionHeaderToFile(::FILE *fp, ELFSectionHeader *shdr){
+    fwrite(shdr, sizeof(uint8_t), sizeof(ELFSectionHeader), fp);
+}
+
+void 
+TR::ELFGenerator::writeSectionNameToFile(::FILE *fp, char * name, uint32_t size){
+    fwrite(name, sizeof(uint8_t), size, fp);
+}
+
+void 
+TR::ELFGenerator::writeCodeSegmentToFile(::FILE *fp){
+    fwrite(_codeStart, sizeof(uint8_t), _codeSize, fp);
+}
+
+void 
+TR::ELFGenerator::writeELFSymbolsToFile(::FILE *fp){
+    fwrite(_ELFSymbols, sizeof(uint8_t), sizeof(ELFSymbol) * _numSymbols, fp);
+}
+
+void 
+TR::ELFGenerator::writeRelaEntriesToFile(::FILE *fp){
+    fwrite(_ELFRela, sizeof(uint8_t), sizeof(ELFRela) * _numRelocations, fp);
 }
 
 
@@ -170,78 +283,85 @@ TR::ELFGenerator::initializeELFTrailerDynStrSection(ELFSectionHeader *shdr, uint
 
 void
 TR::ELFExecutableGenerator::initialize(void){
-    ELFHeader *hdr =
-        static_cast<ELFHeader *>(_rawAllocator.allocate(sizeof(ELFHeader),
+    ELFEHeader *hdr =
+        static_cast<ELFEHeader *>(_rawAllocator.allocate(sizeof(ELFEHeader),
         std::nothrow));
-    _elfHeader = hdr;
+    ELFProgramHeader *phdr =
+        static_cast<ELFProgramHeader *>(_rawAllocator.allocate(sizeof(ELFProgramHeader),
+        std::nothrow));
+    _header = hdr;
+    _programHeader = phdr;
+
     initializeELFHeader();
-    initializeELFHeaderForPlatform(&(_elfHeader->hdr));
+    initializeELFHeaderForPlatform();
     initializePHdr();
 }
 
 void
 TR::ELFExecutableGenerator::initializeELFHeader(void){
-    _elfHeader->hdr.e_type = ET_EXEC;
-    _elfHeader->hdr.e_entry = (ELFAddress) _codeStart;
-    _elfHeader->hdr.e_phoff = offsetof(ELFHeader, phdr); //program header offset
-    _elfHeader->hdr.e_shoff = sizeof(ELFHeader) + _codeSize;
-    _elfHeader->hdr.e_phentsize = sizeof(ELFProgramHeader); //0 for reloc
-    _elfHeader->hdr.e_phnum = 1; //0 for reloc
-    _elfHeader->hdr.e_shnum = 5; // number of sections in trailer (6 for reloc)
-    _elfHeader->hdr.e_shstrndx = 3; // index to shared string table section in trailer (4 for reloc)
+    _header->e_type = ET_EXEC;
+    _header->e_entry = (ELFAddress) _codeStart; //virtual address to which the system first transfers control
+    _header->e_phoff = sizeof(ELFEHeader); //program header offset
+    _header->e_shoff = sizeof(ELFEHeader) + sizeof(ELFProgramHeader) + _codeSize; //section header offset
+    _header->e_phentsize = sizeof(ELFProgramHeader);
+    _header->e_phnum = 1; // number of ELFProgramHeaders
+    _header->e_shnum = 5; // number of sections in trailer
+    _header->e_shstrndx = 3; // index of section header string table section in trailer
 }
 
 void
 TR::ELFExecutableGenerator::initializePHdr(void){
-    // program header initialization (executable only)
-    _elfHeader->phdr.p_type = PT_LOAD;
-    _elfHeader->phdr.p_offset = sizeof(ELFEHeader) + sizeof(ELFProgramHeader);
-    _elfHeader->phdr.p_vaddr = (ELFAddress) _codeStart;
-    _elfHeader->phdr.p_paddr = (ELFAddress) _codeStart;
-    _elfHeader->phdr.p_filesz = _codeSize;
-    _elfHeader->phdr.p_memsz = _codeSize;
-    _elfHeader->phdr.p_flags = PF_X | PF_R; // should add PF_W if we get around to loading patchable code
-    _elfHeader->phdr.p_align = 0x1000;
+    
+    _programHeader->p_type = PT_LOAD; //should be loaded in memory
+    _programHeader->p_offset = sizeof(ELFEHeader) + sizeof(ELFProgramHeader); //offset from the first byte of file to be loaded
+    _programHeader->p_vaddr = (ELFAddress) _codeStart; //virtual address to load into
+    _programHeader->p_paddr = (ELFAddress) _codeStart; //physical address to load into
+    _programHeader->p_filesz = _codeSize; //in-file size
+    _programHeader->p_memsz = _codeSize; //in-memory size
+    _programHeader->p_flags = PF_X | PF_R; // should add PF_W if we get around to loading patchable code
+    _programHeader->p_align = 0x1000;
 }
 
 void
-TR::ELFExecutableGenerator::initializeELFTrailer(void){
-    _elfTrailerSize = _trailerStructSize +
+TR::ELFExecutableGenerator::buildELFTrailer(void){
+    uint32_t shStrTabNameLength = sizeof(_zeroSectionName) +
+                            sizeof(_shStrTabSectionName) +
+                            sizeof(_textSectionName) +
+                            sizeof(_dynSymSectionName) +
+                            sizeof(_dynStrSectionName);
+    _elfTrailerSize = sizeof(ELFSectionHeader) * /* number of section headers */ 5 +
+                      shStrTabNameLength +
                      _numSymbols * sizeof(ELFSymbol) + // NOTE: ELFCodeCacheTrailer includes 1 ELFSymbol: UNDEF
                      _totalELFSymbolNamesLength;
+    
     /* offset calculations */
-    ELFTrailer *trlr = static_cast<ELFTrailer *>(_rawAllocator.allocate(_elfTrailerSize));
-    uint32_t trailerStartOffset = sizeof(ELFHeader) + _codeSize;
-    uint32_t symbolsStartOffset = trailerStartOffset + offsetof(ELFTrailer, symbols);
+    uint32_t trailerStartOffset = sizeof(ELFEHeader) + sizeof(ELFProgramHeader) + _codeSize;
+    uint32_t symbolsStartOffset = trailerStartOffset + sizeof(ELFSectionHeader) * /* Number of section headers */ 5;
     uint32_t symbolNamesStartOffset = symbolsStartOffset + (_numSymbols+1) * sizeof(ELFSymbol);
+    uint32_t shNameOffset = 0;
 
-    initializeELFTrailerZeroSection(&(trlr->zeroSection));
+    initializeZeroSection();
+    shNameOffset += sizeof(_zeroSectionName);
 
-    initializeELFTrailerTextSection(&(trlr->textSection), trlr->textSectionName - trlr->zeroSectionName,
-                                    (ELFAddress) _codeStart, sizeof(ELFHeader), _codeSize);
+    initializeTextSection(shNameOffset,
+                                   (ELFAddress) _codeStart, sizeof(ELFEHeader) + sizeof(ELFProgramHeader), 
+                                   _codeSize);
+    shNameOffset += sizeof(_textSectionName);
 
-    initializeELfTrailerDynSymSection(&(trlr->dynsymSection), trlr->dynsymSectionName - trlr->zeroSectionName,
-                                        symbolsStartOffset, symbolNamesStartOffset - symbolsStartOffset, 4);
-    uint32_t strTabSize = sizeof(trlr->zeroSectionName) +
-                            sizeof(trlr->shstrtabSectionName) +
-                            sizeof(trlr->textSectionName) +
-                            sizeof(trlr->dynsymSectionName) +
-                            sizeof(trlr->dynstrSectionName);
-    uint32_t strTabOffset = trailerStartOffset + offsetof(ELFTrailer, zeroSectionName);
-    initializeELFTrailerStrTabSection(&(trlr->shstrtabSection),  trlr->shstrtabSectionName - trlr->zeroSectionName,
-                                        strTabOffset, strTabSize);
+    initializeDynSymSection(shNameOffset,
+                            symbolsStartOffset, 
+                            symbolNamesStartOffset - symbolsStartOffset,
+                            /* Index of dynStrTab */ 4);
+    shNameOffset += sizeof(_dynSymSectionName);
+    
+    initializeStrTabSection(shNameOffset, symbolsStartOffset , shStrTabNameLength);
+    shNameOffset += sizeof(_shStrTabSectionName);
 
-    initializeELFTrailerDynStrSection(&(trlr->dynstrSection), trlr->dynstrSectionName - trlr->zeroSectionName,
-                                        symbolNamesStartOffset, _totalELFSymbolNamesLength);
+    initializeDynStrSection(shNameOffset, symbolNamesStartOffset, _totalELFSymbolNamesLength);
+    shNameOffset += sizeof(_dynStrSectionName);
 
-    trlr->zeroSectionName[0] = 0;
-    strcpy(trlr->shstrtabSectionName, ".shstrtab");
-    strcpy(trlr->textSectionName, ".text");
-    strcpy(trlr->dynsymSectionName, ".symtab");
-    strcpy(trlr->dynstrSectionName, ".strtab");
-
-    ELFSymbol *elfSymbols = trlr->symbols + 0;
-    char *elfSymbolNames = (char *) (elfSymbols + (_numSymbols+1));
+    ELFSymbol *elfSymbols = _ELFSymbols + 0;
+    char *elfSymbolNames = (char *) (elfSymbols + (_numSymbols+1)); //+1 for the UNDEF symbol
 
     // first symbol is UNDEF symbol: all zeros, even name is zero-terminated empty string
     elfSymbolNames[0] = 0;
@@ -252,18 +372,17 @@ TR::ELFExecutableGenerator::initializeELFTrailer(void){
     elfSymbols[0].st_value = 0;
     elfSymbols[0].st_size = 0;
 
-    CodeCacheSymbol *sym = _symbols;
+    TR::CodeCacheSymbol *sym = _symbols;
     ELFSymbol *elfSym = elfSymbols + 1;
     char *names = elfSymbolNames + 1;
 
     while (sym)
       {
-      //fprintf(stderr, "Writing elf symbol %d, name(%d) = %s\n", (elfSym - elfSymbols), sym->_nameLength, sym->_name);
         memcpy(names, sym->_name, sym->_nameLength);
 
         elfSym->st_name = names - elfSymbolNames;
         elfSym->st_info = ELF_ST_INFO(STB_GLOBAL,STT_FUNC);
-        elfSym->st_other = ELF64_ST_VISIBILITY(STV_DEFAULT);;
+        elfSym->st_other = ELF64_ST_VISIBILITY(STV_DEFAULT);
         elfSym->st_shndx = sym->_start ? 1 : SHN_UNDEF;
         elfSym->st_value = sym->_start ? static_cast<ELFAddress>(sym->_start - _codeStart) : 0;
         elfSym->st_size = sym->_size;
@@ -272,7 +391,6 @@ TR::ELFExecutableGenerator::initializeELFTrailer(void){
 
         sym = sym->_next;
     }
-    _elfTrailer = trlr;
 }
 
 void
@@ -284,12 +402,12 @@ TR::ELFExecutableGenerator::emitELF(const char * filename,
     _numSymbols = numSymbols;
     _totalELFSymbolNamesLength = totalELFSymbolNamesLength;
     
-    initializeELFTrailer();
+    buildELFTrailer();
 
     ::FILE *elfFile = fopen(filename, "wb");
-    fwrite(_elfHeader, sizeof(uint8_t), sizeof(ELFHeader), elfFile);
-    fwrite(_codeStart, sizeof(uint8_t), _codeSize, elfFile);
-    fwrite(_elfTrailer, sizeof(uint8_t), _elfTrailerSize, elfFile);
+    
+    buildELFFile(elfFile);
+
     fclose(elfFile);
 }
 
@@ -297,81 +415,77 @@ TR::ELFExecutableGenerator::emitELF(const char * filename,
 
 void
 TR::ELFRelocatableGenerator::initialize(void){
-    ELFHeader *hdr =
-        static_cast<ELFHeader *>(_rawAllocator.allocate(sizeof(ELFHeader),
+    ELFEHeader *hdr =
+        static_cast<ELFEHeader *>(_rawAllocator.allocate(sizeof(ELFEHeader),
         std::nothrow));
-    _elfHeader = hdr;
+    _header = hdr;
     initializeELFHeader();
-    initializeELFHeaderForPlatform(&(_elfHeader->hdr));
+    initializeELFHeaderForPlatform();
 }
 
 void
 TR::ELFRelocatableGenerator::initializeELFHeader(void){
-    _elfHeader->hdr.e_type = ET_REL;           
-    _elfHeader->hdr.e_entry = 0;
-    _elfHeader->hdr.e_phoff = 0;
-    _elfHeader->hdr.e_shoff = sizeof(ELFHeader) + _codeSize;
-    _elfHeader->hdr.e_phentsize = 0;
-    _elfHeader->hdr.e_phnum = 0;
-    _elfHeader->hdr.e_shnum = 6;
-    _elfHeader->hdr.e_shstrndx = 4;
+    _header->e_type = ET_REL;           
+    _header->e_entry = 0; //no associated entry point for relocatable ELF files
+    _header->e_phoff = 0; //no program header for relocatable files
+    _header->e_shoff = sizeof(ELFEHeader) + _codeSize; //start of the section header table in bytes from the first byte of the ELF file
+    _header->e_phentsize = 0; //no program headers in relocatable elf
+    _header->e_phnum = 0;
+    _header->e_shnum = 6;
+    _header->e_shstrndx = 4; //index of section header string table
 }
 
 void
-TR::ELFRelocatableGenerator::initializeELFTrailer(void){
-    _elfTrailerSize = _trailerStructSize +
+TR::ELFRelocatableGenerator::buildELFTrailer(void){
+    uint32_t shStrTabNameLength = sizeof(_zeroSectionName) +
+                            sizeof(_shStrTabSectionName) +
+                            sizeof(_textSectionName) +
+                            sizeof(_relaSectionName) +
+                            sizeof(_dynSymSectionName) +
+                            sizeof(_dynStrSectionName);
+    _elfTrailerSize = sizeof(ELFSectionHeader) * 6 + //6 section headers in relocatable elf
+                    shStrTabNameLength +
                      _numSymbols * sizeof(ELFSymbol) + // NOTE: ELFCodeCacheTrailer includes 1 ELFSymbol: UNDEF
-                     _totalELFSymbolNamesLength;
-    ELFTrailer *trlr = static_cast<ELFTrailer *>(_rawAllocator.allocate(_elfTrailerSize));
+                     _totalELFSymbolNamesLength +
+                     _numRelocations * sizeof(ELFRela);
+    
 
     /* offset calculations */
-    uint32_t trailerStartOffset = sizeof(ELFHeader) + _codeSize;
-    uint32_t symbolsStartOffset = trailerStartOffset + offsetof(ELFTrailer, symbols);
+    uint32_t trailerStartOffset = sizeof(ELFEHeader) + _codeSize;
+    uint32_t symbolsStartOffset = trailerStartOffset + + sizeof(ELFSectionHeader) * /* Number of section headers */ 6;
     uint32_t symbolNamesStartOffset = symbolsStartOffset + (_numSymbols+1) * sizeof(ELFSymbol);
     uint32_t relaStartOffset = symbolNamesStartOffset + _totalELFSymbolNamesLength;
+    uint32_t shNameOffset = 0;
 
-    initializeELFTrailerZeroSection(&(trlr->zeroSection));
+    initializeZeroSection();
+    shNameOffset += sizeof(_zeroSectionName);
 
+    initializeTextSection(          shNameOffset,
+                                    /*sh_addr*/ 0,
+                                    sizeof(ELFEHeader),
+                                    _codeSize);
+    shNameOffset += sizeof(_textSectionName);
 
-    initializeELFTrailerTextSection(&(trlr->textSection), trlr->textSectionName - trlr->zeroSectionName,
-                                        0, sizeof(ELFHeader), _codeSize);
+    initializeRelaSection(shNameOffset,
+                          relaStartOffset, 
+                          _numRelocations * sizeof(ELFRela));
+    shNameOffset += sizeof(_relaSectionName);
 
-    /* Initialize Rela Section */
-    trlr->relaSection.sh_name = trlr->relaSectionName - trlr->zeroSectionName;
-    trlr->relaSection.sh_type = SHT_RELA;
-    trlr->relaSection.sh_flags = 0;
-    trlr->relaSection.sh_addr = 0;
-    trlr->relaSection.sh_offset = relaStartOffset;
-    trlr->relaSection.sh_size = _numRelocations * sizeof(ELFRela);
-    trlr->relaSection.sh_link = 3; // dynsymSection
-    trlr->relaSection.sh_info = 1;
-    trlr->relaSection.sh_addralign = 8;
-     trlr->relaSection.sh_entsize = sizeof(ELFRela);
+    initializeDynSymSection(shNameOffset, 
+                            symbolsStartOffset,
+                            symbolNamesStartOffset - symbolsStartOffset,
+                            /*Index of dynStrTab*/ 5);
+    shNameOffset += sizeof(_dynSymSectionName);
 
-    initializeELfTrailerDynSymSection(&(trlr->dynsymSection), trlr->dynsymSectionName - trlr->zeroSectionName,
-                                        symbolsStartOffset, symbolNamesStartOffset - symbolsStartOffset, 5);
+    initializeStrTabSection(shNameOffset, symbolsStartOffset, shStrTabNameLength);
+    shNameOffset += sizeof(_shStrTabSectionName);
 
-    uint32_t strTabSize = sizeof(trlr->zeroSectionName) +
-                            sizeof(trlr->shstrtabSectionName) +
-                            sizeof(trlr->textSectionName) +
-                            sizeof(trlr->dynsymSectionName) +
-                            sizeof(trlr->dynstrSectionName) +
-                            sizeof(trlr->relaSectionName);
-    uint32_t strTabOffset = trailerStartOffset + offsetof(ELFTrailer, zeroSectionName);
-    initializeELFTrailerStrTabSection(&(trlr->shstrtabSection), trlr->shstrtabSectionName - trlr->zeroSectionName,
-                                        strTabOffset, strTabSize);
+    initializeDynStrSection(shNameOffset,
+                            symbolNamesStartOffset, 
+                            _totalELFSymbolNamesLength);
+    shNameOffset += sizeof(_dynStrSectionName);
 
-    initializeELFTrailerDynStrSection(&(trlr->dynstrSection), trlr->dynstrSectionName - trlr->zeroSectionName,
-                                        symbolNamesStartOffset, _totalELFSymbolNamesLength);
-
-    trlr->zeroSectionName[0] = 0;
-    strcpy(trlr->shstrtabSectionName, ".shstrtab");
-    strcpy(trlr->textSectionName, ".text");
-    strcpy(trlr->relaSectionName, ".rela.text");
-    strcpy(trlr->dynsymSectionName, ".symtab");
-    strcpy(trlr->dynstrSectionName, ".strtab");
-
-    ELFSymbol *elfSymbols = trlr->symbols + 0;
+    ELFSymbol *elfSymbols = _ELFSymbols + 0;
     char *elfSymbolNames = (char *) (elfSymbols + (_numSymbols+1));
 
     // first symbol is UNDEF symbol: all zeros, even name is zero-terminated empty string
@@ -383,7 +497,7 @@ TR::ELFRelocatableGenerator::initializeELFTrailer(void){
     elfSymbols[0].st_value = 0;
     elfSymbols[0].st_size = 0;
 
-    CodeCacheSymbol *sym = _symbols;
+    TR::CodeCacheSymbol *sym = _symbols;
     ELFSymbol *elfSym = elfSymbols + 1;
     char *names = elfSymbolNames + 1;
 
@@ -403,9 +517,10 @@ TR::ELFRelocatableGenerator::initializeELFTrailer(void){
 
         sym = sym->_next;
     }
-
-    CodeCacheRelocationInfo * reloc = _relocations;
-    ELFRela *elfRela = pointer_cast<ELFRela *>(elfSymbolNames + _totalELFSymbolNamesLength);
+    
+    //build elf rela entries
+    ELFRela *elfRela = _ELFRela + 0;
+    TR::CodeCacheRelocationInfo *reloc = _relocations;
     while (reloc){
         elfRela->r_offset = static_cast<ELFAddress>(reloc->_location - _codeStart);
         elfRela->r_info = ELF64_R_INFO(reloc->_symbol + 1, reloc->_type);
@@ -413,7 +528,6 @@ TR::ELFRelocatableGenerator::initializeELFTrailer(void){
         elfRela++;
         reloc = reloc->_next;
     }
-    _elfTrailer = trlr;
 }
 
 void 
@@ -428,12 +542,12 @@ TR::ELFRelocatableGenerator::emitELF(const char * filename,
     _numRelocations = numRelocations;
     _totalELFSymbolNamesLength = totalELFSymbolNamesLength;
     
-    initializeELFTrailer();
+    buildELFTrailer();
 
     ::FILE *elfFile = fopen(filename, "wb");
-    fwrite(_elfHeader, sizeof(uint8_t), sizeof(ELFHeader), elfFile);
-    fwrite(_codeStart, sizeof(uint8_t), _codeSize, elfFile);
-    fwrite(_elfTrailer, sizeof(uint8_t), _elfTrailerSize, elfFile);
+    
+    buildELFFile(elfFile);
+
     fclose(elfFile);
 }
 
