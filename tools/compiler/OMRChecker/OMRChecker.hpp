@@ -34,6 +34,9 @@
 #if LLVM_VERSION_MAJOR == 3 && LLVM_VERSION_MINOR == 8
 #define LLVM38
 #endif
+#if LLVM_VERSION_MAJOR == 5
+#define LLVM50
+#endif
 
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/SourceLocation.h"
@@ -1028,7 +1031,7 @@ protected:
   ASTConsumer * CreateASTConsumer(CompilerInstance &CI, llvm::StringRef filename) {
     return new OMRCheckingConsumer(filename);
   }
-#elif defined(LLVM36) || defined(LLVM38)
+#elif defined(LLVM36) || defined(LLVM38) || defined(LLVM50)
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI, llvm::StringRef filename) {
     return std::unique_ptr<ASTConsumer>(new OMRCheckingConsumer(filename));
   }
