@@ -42,6 +42,7 @@ namespace OMR { typedef OMR::CompilerEnv CompilerEnvConnector; }
 #include "env/ArithEnv.hpp"
 #include "env/VMEnv.hpp"
 #include "env/VMMethodEnv.hpp"
+#include "omr.h" //for Portlib
 
 namespace TR { class CompilerEnv; }
 
@@ -55,8 +56,12 @@ class OMR_EXTENSIBLE CompilerEnv
 public:
 
    CompilerEnv(TR::RawAllocator raw, const TR::PersistentAllocatorKit &persistentAllocatorKit);
+   
+   CompilerEnv(OMRPortLibrary *omrPort, TR::RawAllocator raw, const TR::PersistentAllocatorKit &persistentAllocatorKit);
 
    TR::CompilerEnv *self();
+
+   OMRPortLibrary * const omrPort;
 
    /// Primordial raw allocator.  This is guaranteed to be thread safe.
    ///

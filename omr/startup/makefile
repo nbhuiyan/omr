@@ -36,6 +36,7 @@ MODULE_INCLUDES += \
   $(top_srcdir)/gc/stats \
   $(top_srcdir)/gc/structs \
   $(top_srcdir)/gc/startup \
+  $(top_srcdir)/compiler/env \
   $(OMRGLUE_INCLUDES)
 
 ifeq (1,$(OMR_GC_SEGREGATED_HEAP))

@@ -121,11 +121,15 @@ initializeJitBuilder(TR_RuntimeHelper *helperIDs, void **helperAddresses, int32_
    //
    TR::RawAllocator rawAllocator;
 
+   OMRPortLibrary omrPort;
+   omrthread_attach(NULL);
+   omrport_init_library(&omrPort, sizeof(OMRPortLibrary));
+   
    try
       {
       // Allocate the host environment structure
       //
-      TR::Compiler = new (rawAllocator) TR::CompilerEnv(rawAllocator, TR::PersistentAllocatorKit(rawAllocator));
+      TR::Compiler = new (rawAllocator) TR::CompilerEnv(&omrPort, rawAllocator, TR::PersistentAllocatorKit(rawAllocator));
       }
    catch (const std::bad_alloc& ba)
       {

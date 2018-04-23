@@ -113,6 +113,7 @@ typedef struct OMR_ExclusiveVMAccessStats {
 typedef struct OMR_VM {
 	struct OMR_Runtime *_runtime;
 	void *_language_vm;
+	void *_compiler;
 	struct OMR_VM *_linkNext;
 	struct OMR_VM *_linkPrevious;
 	struct OMR_VMThread *_vmThreadList;

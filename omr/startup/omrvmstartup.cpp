@@ -40,6 +40,11 @@
 #include "omrgcstartup.hpp"
 #include "StartupManagerImpl.hpp"
 #endif /* OMR_GC */
+
+#if defined(OMR_JIT)
+#include "omrcompilerstartup.hpp"
+#endif /* defined(OMR_JIT) */
+
 #include "OMR_VMThread.hpp"
 
 /* ****************
@@ -440,6 +445,15 @@ OMR_Initialize_VM(OMR_VM **omrVMSlot, OMR_VMThread **omrVMThreadSlot, void *lang
 		goto failed;
 	}
 #endif /* OMR_GC */
+
+#if defined(OMR_JIT)
+	rc = initializeOMRCompiler(omrVM);
+	if (OMR_ERROR_NONE != rc )
+	{
+		omrtty_printf("Failed to start OMR Compiler. rc =%d", rc);
+		goto failed;
+	}
+#endif /* defined(OMR_JIT) */
 
 	{
 		/* Take agent options from OMR_AGENT_OPTIONS */

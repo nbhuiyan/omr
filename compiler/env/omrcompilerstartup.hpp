@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corp. and others
+ * Copyright (c) 2018, 2018 IBM Corp. and others
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which accompanies this
@@ -19,30 +19,27 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef TR_COMPILER_ENV_INCL
-#define TR_COMPILER_ENV_INCL
-
-#include "env/OMRCompilerEnv.hpp"
+#include "env/CompilerEnv.hpp"
 #include "env/RawAllocator.hpp"
-#include "infra/Annotations.hpp"  // for OMR_EXTENSIBLE
+#include "omr.h"
 
-namespace TR
-{
+omr_error_t
+initializeOMRCompiler(OMR_VM *vm)
+{   
+    TR::RawAllocator rawAllocator;
+    try
+    {
+    TR::Compiler = new (rawAllocator) TR::CompilerEnv(vm->_runtime->_portLibrary, rawAllocator, TR::PersistentAllocatorKit(rawAllocator));
+    }
+    catch (const std::bad_alloc& ba)
+    {
+        return OMR_ERROR_INTERNAL;
+    }
 
-class OMR_EXTENSIBLE CompilerEnv : public OMR::CompilerEnvConnector
-   {
-public:
-   CompilerEnv(TR::RawAllocator raw, const TR::PersistentAllocatorKit &persistentAllocatorKit) :
-         OMR::CompilerEnvConnector(raw, persistentAllocatorKit)
-      {}
+   TR::Compiler->initialize();
 
-      CompilerEnv(OMRPortLibrary *omrPort, TR::RawAllocator raw, const TR::PersistentAllocatorKit &persistentAllocatorKit) :
-         OMR::CompilerEnvConnector(omrPort, raw, persistentAllocatorKit)
-      {}
-   };
+   vm->_jit = TR::Compiler;
 
-extern CompilerEnv *Compiler;
-
+   return OMR_ERROR_NONE;
+    
 }
-
-#endif
