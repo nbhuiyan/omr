@@ -252,7 +252,7 @@ TR::Node* generatePoisonNode(TR::Compilation *comp, TR::Block *currentBlock, TR:
 namespace OMR
 {
 
-class OMR_EXTENSIBLE CodeGenerator
+class /*OMR_EXTENSIBLE*/ CodeGenerator
    {
    private:
 
@@ -1117,7 +1117,7 @@ class OMR_EXTENSIBLE CodeGenerator
    // should override these methods if they use constant data snippets.
    //
    void emitDataSnippets() {}
-   bool hasDataSnippets() {return false;} // no virt, cast
+   virtual bool hasDataSnippets() {return false;} // no virt, cast
    int32_t setEstimatedLocationsForDataSnippetLabels(int32_t estimatedSnippetStart) {return 0;}
 
    // called to emit any target address snippets.  The platform specific code generators
