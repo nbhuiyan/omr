@@ -30,7 +30,7 @@ namespace TR { class Compilation; }
 namespace TR
 {
 
-class OMR_EXTENSIBLE CodeGenerator : public OMR::CodeGeneratorConnector
+class /*OMR_EXTENSIBLE*/ CodeGenerator : public OMR::CodeGeneratorConnector
    {
 public:
 

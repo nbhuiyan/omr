@@ -269,7 +269,7 @@ namespace OMR
 namespace X86
 {
 
-class OMR_EXTENSIBLE CodeGenerator : public OMR::CodeGenerator
+class /*OMR_EXTENSIBLE*/ CodeGenerator : public OMR::CodeGenerator
    {
 
    public:
