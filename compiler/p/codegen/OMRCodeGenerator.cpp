@@ -1827,7 +1827,7 @@ OMR::Power::CodeGenerator::computeRegisterSaveDescription(TR_BitVector *regs, bo
    TR_BitVectorIterator regIt(*regs);
    while (regIt.hasMoreElements())
       {
-      int32_t regIndex = self()->isPreservedRegister(regIt.getNextElement());
+      int32_t regIndex = isPreservedRegister(regIt.getNextElement());
       if (regIndex != -1)
          {
          rsd |= 1 << (regIndex - TR::RealRegister::gr15);

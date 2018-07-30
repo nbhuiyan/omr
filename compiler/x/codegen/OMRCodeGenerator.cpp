@@ -2654,7 +2654,7 @@ int32_t OMR::X86::CodeGenerator::computeRegisterSaveDescription(TR_BitVector *re
    TR_BitVectorIterator regIt(*regs);
    while (regIt.hasMoreElements())
       {
-      int32_t regIndex = self()->isPreservedRegister(regIt.getNextElement());
+      int32_t regIndex = isPreservedRegister(regIt.getNextElement());
       if (regIndex != -1)
          {
          TR::RealRegister::RegNum idx = self()->getProperties().getPreservedRegister((uint32_t)regIndex);

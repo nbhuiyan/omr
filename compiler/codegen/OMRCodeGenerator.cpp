@@ -1239,7 +1239,7 @@ OMR::CodeGenerator::opCodeIsNoOp(TR::ILOpCode &opCode)
    if (TR::ILOpCode::isOpCodeAnImplicitNoOp(opCode))
       return true;
 
-   return self()->opCodeIsNoOpOnThisPlatform(opCode);
+   return opCodeIsNoOpOnThisPlatform(opCode);
    }
 
 
@@ -2918,7 +2918,7 @@ OMR::CodeGenerator::isMaterialized(TR::Node * node)
    else
       return false;
 
-   return self()->shouldValueBeInACommonedNode(value);
+   return shouldValueBeInACommonedNode(value);
    }
 
 bool

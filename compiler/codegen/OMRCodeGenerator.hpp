@@ -507,7 +507,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    // --------------------------------------------------------------------------
    // Capabilities
    //
-   bool supports32bitAiadd() {return true;}  // no virt, default
+   virtual bool supports32bitAiadd() {return true;}  // no virt, default
    bool supportsMergingGuards() {return false;} // no virt, default
 
    // --------------------------------------------------------------------------
@@ -541,7 +541,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    bool shouldYankCompressedRefs() { return false; } // no virt, default, cast
    bool materializesHeapBase() { return true; } // no virt, default, cast
-   bool canFoldLargeOffsetInAddressing() { return false; } // no virt, default, cast
+   virtual bool canFoldLargeOffsetInAddressing() { return false; } // no virt, default, cast
 
    void insertDebugCounters();
 
@@ -607,7 +607,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    bool getSupportsProfiledInlining() { return _flags4.testAny(SupportsProfiledInlining);}
    void setSupportsProfiledInlining() { _flags4.set(SupportsProfiledInlining);}
-   bool supportsInliningOfIsInstance() {return false;} // no virt, default
+   virtual bool supportsInliningOfIsInstance() {return false;} // no virt, default
    bool supportsPassThroughCopyToNewVirtualRegister() { return false; } // no virt, default
 
    uint8_t getSizeOfCombinedBuffer() {return 0;} // no virt, default
@@ -622,7 +622,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    virtual bool branchesAreExpensive() { return true; } // no virt, default
    bool opCodeIsNoOp(TR::ILOpCode &opCode); // no virt, 1 impl
-   bool opCodeIsNoOpOnThisPlatform(TR::ILOpCode &opCode) {return false;} // no virt
+   virtual bool opCodeIsNoOpOnThisPlatform(TR::ILOpCode &opCode) {return false;} // no virt
 
    bool supportsSinglePrecisionSQRT() {return false;} // no virt
    bool supportsFusedMultiplyAdd() {return false;} // no virt
@@ -632,7 +632,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    virtual bool canBeAffectedByStoreTagStalls() { return false; } // no virt, default
 
    bool isMaterialized(TR::Node *); // no virt, cast
-   bool shouldValueBeInACommonedNode(int64_t) { return false; } // no virt, cast
+   virtual bool shouldValueBeInACommonedNode(int64_t) { return false; } // no virt, cast
    bool materializesLargeConstants() { return false; }
 
    bool canUseImmedInstruction(int64_t v) {return false;} // no virt
@@ -654,11 +654,11 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    // FrontEnd, not code generator
    //
    bool getSupportsNewObjectAlignment() { return false; } // no virt
-   bool getSupportsTenuredObjectAlignment() { return false; } // no virt
-   bool isObjectOfSizeWorthAligning(uint32_t size) { return false; } // no virt
+   virtual bool getSupportsTenuredObjectAlignment() { return false; } // no virt
+   virtual bool isObjectOfSizeWorthAligning(uint32_t size) { return false; } // no virt
 
    // J9
-   int32_t getInternalPtrMapBit() { return 31;} // no virt
+   virtual int32_t getInternalPtrMapBit() { return 31;} // no virt
 
    uint32_t getMaxObjectSizeGuaranteedNotToOverflow() { return _maxObjectSizeGuaranteedNotToOverflow; }
 
@@ -710,7 +710,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    void setLowestSavedRegister(int32_t v) {_lowestSavedReg = v;}
 
    bool processInstruction(TR::Instruction *instr, TR_BitVector **registerUsageInfo, int32_t &blockNum, int32_t &isFence, bool traceIt) {return false;} // no virt, cast
-   uint32_t isPreservedRegister(int32_t regIndex) { return 0; } // no virt, cast
+   virtual uint32_t isPreservedRegister(int32_t regIndex) { return 0; } // no virt, cast
    bool isReturnInstruction(TR::Instruction *instr) { return false; } // no virt, cast
    bool isBranchInstruction(TR::Instruction *instr) { return false; } // no virt, cast
    int32_t isFenceInstruction(TR::Instruction *instr) { return false; } // no virt
@@ -829,7 +829,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    void addSymbolAndDataTypeToMap(TR::Symbol *symbol, TR::DataType dt);
    TR::DataType getDataTypeFromSymbolMap(TR::Symbol *symbol);
 
-   bool prepareForGRA(); // no virt, cast
+   virtual bool prepareForGRA(); // no virt, cast
 
    uint32_t getGlobalRegister(TR_GlobalRegisterNumber n) {return _globalRegisterTable[n];}
    uint32_t *setGlobalRegisterTable(uint32_t *p) {return (_globalRegisterTable = p);}
@@ -920,17 +920,17 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    TR_GlobalRegisterNumber findCoalescenceRegisterForParameter(TR::Node *callNode, TR_RegisterCandidate *rc, uint32_t childIndex, bool *isUnpreferred);
    TR_RegisterCandidate *findUsedCandidate(TR::Node *node, TR_RegisterCandidate *rc, TR_BitVector *visitedNodes);
 
-   bool allowGlobalRegisterAcrossBranch(TR_RegisterCandidate *, TR::Node * branchNode); // no virt
+   virtual bool allowGlobalRegisterAcrossBranch(TR_RegisterCandidate *, TR::Node * branchNode); // no virt
    virtual void removeUnavailableRegisters(TR_RegisterCandidate * rc, TR::Block * * blocks, TR_BitVector & availableRegisters) {} // no virt
    void setUnavailableRegistersUsage(TR_Array<TR_BitVector>  & liveOnEntryUsage, TR_Array<TR_BitVector>   & liveOnExitUsage) {} // no virt
 
    int32_t getMaximumNumberOfGPRsAllowedAcrossEdge(TR::Node *) { return INT_MAX; } // no virt
-   int32_t getMaximumNumberOfFPRsAllowedAcrossEdge(TR::Node *) { return INT_MAX; } // no virt
+   virtual int32_t getMaximumNumberOfFPRsAllowedAcrossEdge(TR::Node *) { return INT_MAX; } // no virt
    int32_t getMaximumNumberOfVRFsAllowedAcrossEdge(TR::Node *) { return INT_MAX; } // no virt
    int32_t getMaximumNumberOfGPRsAllowedAcrossEdge(TR::Block *block); // no virt
    int32_t getMaximumNumbersOfAssignableGPRs() { return INT_MAX; } // no virt, cast
    int32_t getMaximumNumbersOfAssignableFPRs() { return INT_MAX; } // no virt, cast
-   int32_t getMaximumNumbersOfAssignableVRs()  { return INT_MAX; } // no virt, cast
+   virtual int32_t getMaximumNumbersOfAssignableVRs()  { return INT_MAX; } // no virt, cast
    virtual bool willBeEvaluatedAsCallByCodeGen(TR::Node *node, TR::Compilation *comp){ return true;}
    bool isGlobalRegisterAvailable(TR_GlobalRegisterNumber, TR::DataType) { return true; } // no virt
 
@@ -1204,7 +1204,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    //
 
    // P now
-   bool isRotateAndMask(TR::Node *node) { return false; } // no virt
+   virtual bool isRotateAndMask(TR::Node *node) { return false; } // no virt
 
    TR::Instruction *generateNop(TR::Node *node, TR::Instruction *instruction=0, TR_NOPKind nopKind=TR_NOPStandard); // no virt, cast
    bool isOutOfLineHotPath() { TR_ASSERT(0, "isOutOfLineHotPath is only implemented for 390 and ppc"); return false;} // no virt
@@ -1249,7 +1249,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    // to be processed for it to be worth it to execute the 'translate' built-in function
    // arrayTranslateAndTestMinimumNumberOfIterations returns the minimum number of iterations
    // that the loop must run for the transformation to be worthwhile.
-   int32_t arrayTranslateTableRequiresAlignment(bool isByteSource, bool isByteTarget)  { return 0; } // no virt
+   virtual int32_t arrayTranslateTableRequiresAlignment(bool isByteSource, bool isByteTarget)  { return 0; } // no virt
 
    // These methods used to return a default value of INT_MAX. However, in at least one place,
    // and quite possibly elsewhere, the optimizer tests for
@@ -1287,15 +1287,15 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    // the following functions evaluate whether a codegen for the node or for static
    // symbol reference requires entry in the literal pool
-   bool arithmeticNeedsLiteralFromPool(TR::Node *node) { return false; } // no virt
+   virtual bool arithmeticNeedsLiteralFromPool(TR::Node *node) { return false; } // no virt
    bool bitwiseOpNeedsLiteralFromPool(TR::Node *parent, TR::Node *child) { return false; } // no virt
    bool bndsChkNeedsLiteralFromPool(TR::Node *node) { return false; } // no virt
-   bool constLoadNeedsLiteralFromPool(TR::Node *node) { return false; } // no virt, cast
+   virtual bool constLoadNeedsLiteralFromPool(TR::Node *node) { return false; } // no virt, cast
    void setOnDemandLiteralPoolRun(bool answer) {} // no virt, cast
    bool isLiteralPoolOnDemandOn () { return false; } // no virt, cast
    bool supportsOnDemandLiteralPool() { return false; } // no virt, cast
    bool supportsDirectIntegralLoadStoresFromLiteralPool() { return false; } // no virt
-   bool supportsHighWordFacility() { return false; } // no virt, default, cast
+   virtual bool supportsHighWordFacility() { return false; } // no virt, default, cast
 
    bool inlineDirectCall(TR::Node *node, TR::Register *&resultReg) { return false; }
 
@@ -1366,7 +1366,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    static bool treeContainsCall(TR::TreeTop * treeTop);
 
    // IA32 only?
-   int32_t arrayInitMinimumNumberOfBytes() {return 8;} // no virt
+   virtual int32_t arrayInitMinimumNumberOfBytes() {return 8;} // no virt
 
    TR::Instruction *saveOrRestoreRegisters(TR_BitVector *regs, TR::Instruction *cursor, bool doSaves);
 
@@ -1549,7 +1549,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    bool getSupportsScaledIndexAddressing() { return _flags1.testAny(SupportsScaledIndexAddressing); }
    void setSupportsScaledIndexAddressing() { _flags1.set(SupportsScaledIndexAddressing); }
 
-   bool isAddressScaleIndexSupported(int32_t scale) { return false; } // no virt
+   virtual bool isAddressScaleIndexSupported(int32_t scale) { return false; } // no virt
 
    bool getSupportsConstantOffsetInAddressing(int64_t value);
    bool getSupportsConstantOffsetInAddressing() { return _flags3.testAny(SupportsConstantOffsetInAddressing); }
