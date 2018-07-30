@@ -1141,10 +1141,10 @@ OMR::X86::EnlargementResult OMR::X86::MemoryReference::enlarge(TR::CodeGenerator
    int32_t growth = 0;
    if (!self()->isForceWideDisplacement())
       {
-      int32_t currentEncodingAllocation = self()->estimateBinaryLength(cg);
+      int32_t currentEncodingAllocation = estimateBinaryLength(cg);
       int32_t currentPatchSize = self()->getBinaryLengthLowerBound(cg);
       _flags.set(MemRef_ForceWideDisplacement);
-      int32_t potentialEncodingGrowth = self()->estimateBinaryLength(cg) - currentPatchSize;
+      int32_t potentialEncodingGrowth = estimateBinaryLength(cg) - currentPatchSize;
       int32_t potentialPatchGrowth = self()->getBinaryLengthLowerBound(cg) - currentEncodingAllocation;
 
       if (potentialPatchGrowth > 0 &&
@@ -1157,7 +1157,7 @@ OMR::X86::EnlargementResult OMR::X86::MemoryReference::enlarge(TR::CodeGenerator
       else
          {
          _flags.reset(MemRef_ForceWideDisplacement);
-         self()->estimateBinaryLength(cg);
+         estimateBinaryLength(cg);
          return OMR::X86::EnlargementResult(0, 0);
          }
       }

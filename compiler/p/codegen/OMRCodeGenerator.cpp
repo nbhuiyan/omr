@@ -623,13 +623,13 @@ TR::Instruction *OMR::Power::CodeGenerator::generateGroupEndingNop(TR::Node *nod
    {
    if (TR::Compiler->target.cpu.id() >= TR_PPCp6) // handles P7, P8
       {
-      preced = self()->generateNop(node , preced , TR_NOPEndGroup);
+      preced = generateNop(node , preced , TR_NOPEndGroup);
       }
    else
       {
-      preced = self()->generateNop(node , preced);
-      preced = self()->generateNop(node , preced);
-      preced = self()->generateNop(node , preced);
+      preced = generateNop(node , preced);
+      preced = generateNop(node , preced);
+      preced = generateNop(node , preced);
       }
 
    return preced;
@@ -637,7 +637,7 @@ TR::Instruction *OMR::Power::CodeGenerator::generateGroupEndingNop(TR::Node *nod
 
 TR::Instruction *OMR::Power::CodeGenerator::generateProbeNop(TR::Node *node , TR::Instruction *preced)
    {
-   preced = self()->generateNop(node , preced , TR_ProbeNOP);
+   preced = generateNop(node , preced , TR_ProbeNOP);
    return preced;
    }
 
@@ -2051,14 +2051,14 @@ void OMR::Power::CodeGenerator::doBinaryEncoding()
                {
                if (TR::Compiler->target.cpu.id() >= TR_PPCp6)
                   {
-                  nop = self()->generateNop(data.cursorInstruction->getNode(), data.cursorInstruction->getPrev(), TR_NOPEndGroup); // handles P6, P7
+                  nop = generateNop(data.cursorInstruction->getNode(), data.cursorInstruction->getPrev(), TR_NOPEndGroup); // handles P6, P7
                   nop->setNext(data.cursorInstruction);
                   data.cursorInstruction = nop;
                   uselessFetched++;
                   }
                for (; uselessFetched < 8; uselessFetched++)
                   {
-                  nop = self()->generateNop(data.cursorInstruction->getNode(), data.cursorInstruction->getPrev(), TR_NOPStandard);
+                  nop = generateNop(data.cursorInstruction->getNode(), data.cursorInstruction->getPrev(), TR_NOPStandard);
                   nop->setNext(data.cursorInstruction);
                   data.cursorInstruction = nop;
                   }

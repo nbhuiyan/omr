@@ -631,7 +631,7 @@ OMR::CodeGenerator::doInstructionSelection()
    {
    TR::Compilation *comp = self()->comp();
 
-   self()->setNextAvailableBlockIndex(comp->getFlowGraph()->getNextNodeNumber() + 1);
+   setNextAvailableBlockIndex(comp->getFlowGraph()->getNextNodeNumber() + 1);
 
    // Set default value for pre-prologue size
    //
@@ -1159,7 +1159,7 @@ uint16_t OMR::CodeGenerator::getNumberOfGlobalGPRs()
 int32_t OMR::CodeGenerator::getMaximumNumberOfGPRsAllowedAcrossEdge(TR::Block *block)
    {
    TR::Node *node = block->getLastRealTreeTop()->getNode();
-   return self()->getMaximumNumberOfGPRsAllowedAcrossEdge(node);
+   return getMaximumNumberOfGPRsAllowedAcrossEdge(node);
    }
 
 
@@ -1353,7 +1353,7 @@ bool OMR::CodeGenerator::areAssignableGPRsScarce()
    static char *c1 = feGetEnv("TR_ScarceGPRsThreshold");
    if (c1)
       threshold = atoi(c1);
-      return (self()->getMaximumNumbersOfAssignableGPRs() <= threshold);
+      return (getMaximumNumbersOfAssignableGPRs() <= threshold);
    }
 
 // J9
@@ -2327,7 +2327,7 @@ OMR::CodeGenerator::setEstimatedLocationsForSnippetLabels(int32_t estimatedSnipp
 
    self()->setEstimatedSnippetStart(estimatedSnippetStart);
 
-   if (self()->hasTargetAddressSnippets())
+   if (hasTargetAddressSnippets())
       {
       estimatedSnippetStart = self()->setEstimatedLocationsForTargetAddressSnippetLabels(estimatedSnippetStart);
       }
@@ -2370,7 +2370,7 @@ OMR::CodeGenerator::emitSnippets()
 
    // Emit target address snippets first.
    //
-   if (self()->hasTargetAddressSnippets())
+   if (hasTargetAddressSnippets())
       {
       emitTargetAddressSnippets();
       }

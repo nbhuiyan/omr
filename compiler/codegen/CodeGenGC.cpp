@@ -156,7 +156,7 @@ OMR::CodeGenerator::buildGCMapsForInstructionAndSnippet(TR::Instruction *instr)
 
       // The info bits are encoded in the register mask on the instruction (if there are any).
       //
-      map->maskRegistersWithInfoBits(instr->getGCRegisterMask(), self()->getRegisterMapInfoBitsMask());
+      map->maskRegistersWithInfoBits(instr->getGCRegisterMask(), getRegisterMapInfoBitsMask());
       instr->setGCMap(map);
       }
 
