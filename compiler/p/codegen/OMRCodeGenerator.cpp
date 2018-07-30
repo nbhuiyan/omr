@@ -3232,7 +3232,7 @@ TR::Instruction *OMR::Power::CodeGenerator::generateDebugCounterBump(TR::Instruc
       {
       TR::Register *deltaReg = self()->allocateRegister();
       cursor = loadConstant(self(), node, delta, deltaReg, cursor);
-      cursor = self()->generateDebugCounterBump(cursor, counter, deltaReg, cond);
+      cursor = generateDebugCounterBump(cursor, counter, deltaReg, cond);
       if (cond)
          {
          addDependency(cond, deltaReg, TR::RealRegister::NoReg, TR_GPR, self());
@@ -3306,7 +3306,7 @@ TR::Instruction *OMR::Power::CodeGenerator::generateDebugCounterBump(TR::Instruc
       {
       TR::Register *deltaReg = srm.findOrCreateScratchRegister();
       cursor = loadConstant(self(), node, delta, deltaReg, cursor);
-      cursor = self()->generateDebugCounterBump(cursor, counter, deltaReg, srm);
+      cursor = generateDebugCounterBump(cursor, counter, deltaReg, srm);
       srm.reclaimScratchRegister(deltaReg);
       return cursor;
       }

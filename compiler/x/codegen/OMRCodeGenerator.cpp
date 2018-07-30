@@ -3374,12 +3374,12 @@ TR::Instruction *OMR::X86::CodeGenerator::generateDebugCounterBump(TR::Instructi
 
 TR::Instruction *OMR::X86::CodeGenerator::generateDebugCounterBump(TR::Instruction *cursor, TR::DebugCounterBase *counter, int32_t delta, TR_ScratchRegisterManager &srm)
    {
-   return self()->generateDebugCounterBump(cursor, counter, delta, NULL);
+   return generateDebugCounterBump(cursor, counter, delta, NULL);
    }
 
 TR::Instruction *OMR::X86::CodeGenerator::generateDebugCounterBump(TR::Instruction *cursor, TR::DebugCounterBase *counter, TR::Register *deltaReg, TR_ScratchRegisterManager &srm)
    {
-   return self()->generateDebugCounterBump(cursor, counter, deltaReg, NULL);
+   return generateDebugCounterBump(cursor, counter, deltaReg, NULL);
    }
 
 void OMR::X86::CodeGenerator::removeUnavailableRegisters(TR_RegisterCandidate * rc, TR::Block * * blocks, TR_BitVector & availableRegisters)

@@ -563,10 +563,10 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    TR::Instruction *generateDebugCounter(const char *name, TR_ScratchRegisterManager &srm, int32_t delta = 1, int8_t fidelity = TR::DebugCounter::Undetermined, int32_t staticDelta = 1, TR::Instruction *cursor = NULL);
    TR::Instruction *generateDebugCounter(const char *name, TR::Register *deltaReg, TR_ScratchRegisterManager &srm, int8_t fidelity = TR::DebugCounter::Undetermined, int32_t staticDelta = 1, TR::Instruction *cursor = NULL);
 
-   TR::Instruction *generateDebugCounterBump(TR::Instruction *cursor, TR::DebugCounterBase *counter, int32_t delta, TR::RegisterDependencyConditions *cond){ return cursor; } // no virt, default, cast
-   TR::Instruction *generateDebugCounterBump(TR::Instruction *cursor, TR::DebugCounterBase *counter, TR::Register *deltaReg, TR::RegisterDependencyConditions *cond){ return cursor; } // no virt, default, cast
-   TR::Instruction *generateDebugCounterBump(TR::Instruction *cursor, TR::DebugCounterBase *counter, int32_t delta, TR_ScratchRegisterManager &srm){ return cursor; } // no virt, default, cast
-   TR::Instruction *generateDebugCounterBump(TR::Instruction *cursor, TR::DebugCounterBase *counter, TR::Register *deltaReg, TR_ScratchRegisterManager &srm){ return cursor; } // no virt, default, cast
+   virtual TR::Instruction *generateDebugCounterBump(TR::Instruction *cursor, TR::DebugCounterBase *counter, int32_t delta, TR::RegisterDependencyConditions *cond){ return cursor; } // no virt, default, cast
+   virtual TR::Instruction *generateDebugCounterBump(TR::Instruction *cursor, TR::DebugCounterBase *counter, TR::Register *deltaReg, TR::RegisterDependencyConditions *cond){ return cursor; } // no virt, default, cast
+   virtual TR::Instruction *generateDebugCounterBump(TR::Instruction *cursor, TR::DebugCounterBase *counter, int32_t delta, TR_ScratchRegisterManager &srm){ return cursor; } // no virt, default, cast
+   virtual TR::Instruction *generateDebugCounterBump(TR::Instruction *cursor, TR::DebugCounterBase *counter, TR::Register *deltaReg, TR_ScratchRegisterManager &srm){ return cursor; } // no virt, default, cast
 
    // NOT USED?
    bool supportsDebugCounters(TR::DebugCounterInjectionPoint injectionPoint){ return injectionPoint == TR::TR_BeforeCodegen; } // no virt, default
@@ -620,7 +620,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    int16_t getMinShortForLongCompareNarrower() { return SHRT_MIN; } // no virt, default
    int8_t getMinByteForLongCompareNarrower() { return SCHAR_MIN; } // no virt, default
 
-   bool branchesAreExpensive() { return true; } // no virt, default
+   virtual bool branchesAreExpensive() { return true; } // no virt, default
    bool opCodeIsNoOp(TR::ILOpCode &opCode); // no virt, 1 impl
    bool opCodeIsNoOpOnThisPlatform(TR::ILOpCode &opCode) {return false;} // no virt
 
@@ -629,14 +629,14 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    bool supportsNegativeFusedMultiplyAdd() {return false;} // no virt
 
    bool supportsComplexAddressing() {return false;} // no virt
-   bool canBeAffectedByStoreTagStalls() { return false; } // no virt, default
+   virtual bool canBeAffectedByStoreTagStalls() { return false; } // no virt, default
 
    bool isMaterialized(TR::Node *); // no virt, cast
    bool shouldValueBeInACommonedNode(int64_t) { return false; } // no virt, cast
    bool materializesLargeConstants() { return false; }
 
    bool canUseImmedInstruction(int64_t v) {return false;} // no virt
-   bool needsNormalizationBeforeShifts() { return false; } // no virt, cast
+   virtual bool needsNormalizationBeforeShifts() { return false; } // no virt, cast
 
    uint32_t getNumberBytesReadInaccessible() { return _numberBytesReadInaccessible; }
    uint32_t getNumberBytesWriteInaccessible() { return _numberBytesWriteInaccessible; }
@@ -644,7 +644,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    bool codegenSupportsUnsignedIntegerDivide() {return false;} // no virt
    bool mulDecompositionCostIsJustified(int numOfOperations, char bitPosition[], char operationType[], int64_t value); // no virt
 
-   bool codegenSupportsLoadlessBNDCheck() {return false;} // no virt, cast
+   virtual bool codegenSupportsLoadlessBNDCheck() {return false;} // no virt, cast
 
    // called to determine if multiply decomposition exists in platform codegen so that codegen sequences are used
    // instead of the IL transformed multiplies
@@ -721,7 +721,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    int32_t computeRegisterSaveDescription(TR_BitVector *regs, bool populateInfo = false) { return 0; } // no virt
    void processIncomingParameterUsage(TR_BitVector **registerUsageInfo, int32_t blockNum) { return; } // no virt
    void updateSnippetMapWithRSD(TR::Instruction *cur, int32_t rsd) { return; } // no virt
-   bool isTargetSnippetOrOutOfLine(TR::Instruction *instr, TR::Instruction **start, TR::Instruction **end) { return false; }
+   virtual bool isTargetSnippetOrOutOfLine(TR::Instruction *instr, TR::Instruction **start, TR::Instruction **end) { return false; }
 
    // --------------------------------------------------------------------------
    // Method frame building
@@ -921,7 +921,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    TR_RegisterCandidate *findUsedCandidate(TR::Node *node, TR_RegisterCandidate *rc, TR_BitVector *visitedNodes);
 
    bool allowGlobalRegisterAcrossBranch(TR_RegisterCandidate *, TR::Node * branchNode); // no virt
-   void removeUnavailableRegisters(TR_RegisterCandidate * rc, TR::Block * * blocks, TR_BitVector & availableRegisters) {} // no virt
+   virtual void removeUnavailableRegisters(TR_RegisterCandidate * rc, TR::Block * * blocks, TR_BitVector & availableRegisters) {} // no virt
    void setUnavailableRegistersUsage(TR_Array<TR_BitVector>  & liveOnEntryUsage, TR_Array<TR_BitVector>   & liveOnExitUsage) {} // no virt
 
    int32_t getMaximumNumberOfGPRsAllowedAcrossEdge(TR::Node *) { return INT_MAX; } // no virt
@@ -1123,7 +1123,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    // called to emit any target address snippets.  The platform specific code generators
    // should override these methods if they use target address snippets.
    //
-   void emitTargetAddressSnippets() {}
+   virtual void emitTargetAddressSnippets() {}
    bool hasTargetAddressSnippets() {return false;} // no virt, cast
    int32_t setEstimatedLocationsForTargetAddressSnippetLabels(int32_t estimatedSnippetStart) {return 0;}
 
@@ -1230,7 +1230,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    bool IsInMemoryType(TR::DataType type) { return false; }
 
-   bool nodeMayCauseException(TR::Node *node) { return false; } // no virt
+   virtual bool nodeMayCauseException(TR::Node *node) { return false; } // no virt
 
    // Should these be in codegen?
    bool isSupportedAdd(TR::Node *addr);
