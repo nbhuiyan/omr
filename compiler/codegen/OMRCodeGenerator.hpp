@@ -470,7 +470,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    void startUsingRegister(TR::Register *reg);
    void stopUsingRegister(TR::Register *reg);
 
-   void setCurrentBlockIndex(int32_t blockIndex) { } // no virt, default, cast
+   virtual void setCurrentBlockIndex(int32_t blockIndex) { } // no virt, default, cast
    int32_t getCurrentBlockIndex() { return -1; } // no virt, default
 
    TR::Instruction *lastInstructionBeforeCurrentEvaluationTreeTop()
@@ -489,7 +489,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    bool isRegisterClobberable(TR::Register *reg, uint16_t count);
 
    // ilgen
-   bool ilOpCodeIsSupported(TR::ILOpCodes); // no virt, default, cast
+   virtual bool ilOpCodeIsSupported(TR::ILOpCodes); // no virt, default, cast
 
 
 
@@ -608,7 +608,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    bool getSupportsProfiledInlining() { return _flags4.testAny(SupportsProfiledInlining);}
    void setSupportsProfiledInlining() { _flags4.set(SupportsProfiledInlining);}
    virtual bool supportsInliningOfIsInstance() {return false;} // no virt, default
-   bool supportsPassThroughCopyToNewVirtualRegister() { return false; } // no virt, default
+   virtual bool supportsPassThroughCopyToNewVirtualRegister() { return false; } // no virt, default
 
    virtual uint8_t getSizeOfCombinedBuffer() {return 0;} // no virt, default
 
@@ -633,7 +633,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    bool isMaterialized(TR::Node *); // no virt, cast
    virtual bool shouldValueBeInACommonedNode(int64_t) { return false; } // no virt, cast
-   bool materializesLargeConstants() { return false; }
+   virtual bool materializesLargeConstants() { return false; }
 
    bool canUseImmedInstruction(int64_t v) {return false;} // no virt
    virtual bool needsNormalizationBeforeShifts() { return false; } // no virt, cast
@@ -678,7 +678,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    // --------------------------------------------------------------------------
    // FE capability, not code generator
    //
-   bool internalPointerSupportImplemented() {return false;} // no virt, cast
+   virtual bool internalPointerSupportImplemented() {return false;} // no virt, cast
    bool supportsInternalPointers();
 
    // --------------------------------------------------------------------------
@@ -924,7 +924,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    virtual void removeUnavailableRegisters(TR_RegisterCandidate * rc, TR::Block * * blocks, TR_BitVector & availableRegisters) {} // no virt
    virtual void setUnavailableRegistersUsage(TR_Array<TR_BitVector>  & liveOnEntryUsage, TR_Array<TR_BitVector>   & liveOnExitUsage) {} // no virt
 
-   virtual int32_t getMaximumNumberOfGPRsAllowedAcrossEdge(TR::Node *) { return INT_MAX; } // no virt
+   virtual virtual int32_t getMaximumNumberOfGPRsAllowedAcrossEdge(TR::Node *) { return INT_MAX; } // no virt
    virtual int32_t getMaximumNumberOfFPRsAllowedAcrossEdge(TR::Node *) { return INT_MAX; } // no virt
    int32_t getMaximumNumberOfVRFsAllowedAcrossEdge(TR::Node *) { return INT_MAX; } // no virt
    virtual int32_t getMaximumNumberOfGPRsAllowedAcrossEdge(TR::Block *block); // no virt
@@ -1118,7 +1118,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    //
    void emitDataSnippets() {}
    virtual bool hasDataSnippets() {return false;} // no virt, cast
-   int32_t setEstimatedLocationsForDataSnippetLabels(int32_t estimatedSnippetStart) {return 0;}
+   virtual int32_t setEstimatedLocationsForDataSnippetLabels(int32_t estimatedSnippetStart) {return 0;}
 
    // called to emit any target address snippets.  The platform specific code generators
    // should override these methods if they use target address snippets.
@@ -1277,7 +1277,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    virtual int32_t arrayTranslateMinimumNumberOfElements(bool isByteSource, bool isByteTarget); // no virt
 
    // TO TransformUtil.  Make platform specific
-   int32_t arrayTranslateAndTestMinimumNumberOfIterations(); // no virt
+   virtual int32_t arrayTranslateAndTestMinimumNumberOfIterations(); // no virt
    static int32_t defaultArrayTranslateMinimumNumberOfIterations(const char *methodName);
    static bool useOldArrayTranslateMinimumNumberOfIterations()
       {
@@ -1288,7 +1288,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    // the following functions evaluate whether a codegen for the node or for static
    // symbol reference requires entry in the literal pool
    virtual bool arithmeticNeedsLiteralFromPool(TR::Node *node) { return false; } // no virt
-   bool bitwiseOpNeedsLiteralFromPool(TR::Node *parent, TR::Node *child) { return false; } // no virt
+   virtual bool bitwiseOpNeedsLiteralFromPool(TR::Node *parent, TR::Node *child) { return false; } // no virt
    bool bndsChkNeedsLiteralFromPool(TR::Node *node) { return false; } // no virt
    virtual bool constLoadNeedsLiteralFromPool(TR::Node *node) { return false; } // no virt, cast
    virtual void setOnDemandLiteralPoolRun(bool answer) {} // no virt, cast
@@ -1360,7 +1360,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    // Allows a platform code generator to assert that a particular node operation will use 64 bit values
    // that are not explicitly present in the node datatype.
-   bool usesImplicit64BitGPRs(TR::Node *node) { return false; } // no virt
+   virtual bool usesImplicit64BitGPRs(TR::Node *node) { return false; } // no virt
 
    // General utility?
    static bool treeContainsCall(TR::TreeTop * treeTop);

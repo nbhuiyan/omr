@@ -667,7 +667,7 @@ OMR::CodeGenerator::doInstructionSelection()
          {
          TR::Block *block = node->getBlock();
          self()->setCurrentEvaluationBlock(block);
-         self()->setCurrentBlockIndex(block->getNumber());
+         setCurrentBlockIndex(block->getNumber());
 
          if (!block->isExtensionOfPreviousBlock())
             {
@@ -1131,7 +1131,7 @@ bool OMR::CodeGenerator::supportsInternalPointers()
    if (_disableInternalPointers)
       return false;
 
-   return self()->internalPointerSupportImplemented();
+   return internalPointerSupportImplemented();
    }
 
 
@@ -2340,7 +2340,7 @@ OMR::CodeGenerator::setEstimatedLocationsForSnippetLabels(int32_t estimatedSnipp
 
    if (hasDataSnippets())
       {
-      estimatedSnippetStart = self()->setEstimatedLocationsForDataSnippetLabels(estimatedSnippetStart);
+      estimatedSnippetStart = setEstimatedLocationsForDataSnippetLabels(estimatedSnippetStart);
       }
 
    return estimatedSnippetStart;
