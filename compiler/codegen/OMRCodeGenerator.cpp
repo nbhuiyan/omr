@@ -2924,7 +2924,7 @@ OMR::CodeGenerator::isMaterialized(TR::Node * node)
 bool
 OMR::CodeGenerator::canNullChkBeImplicit(TR::Node *node)
    {
-   return self()->canNullChkBeImplicit(node, false);
+   return canNullChkBeImplicit(node, false);
    }
 
 bool

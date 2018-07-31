@@ -1903,7 +1903,7 @@ OMR::CodeGenerator::pickRegister(TR_RegisterCandidate     *rc,
           || dtype == TR::DecimalLongDouble
 #endif
           )
-         preservedRegisters = self()->getGlobalFPRsPreservedAcrossCalls();
+         preservedRegisters = getGlobalFPRsPreservedAcrossCalls();
       else
          preservedRegisters = self()->getGlobalGPRsPreservedAcrossCalls();
       if (debug("tracePickRegister") || self()->comp()->getOptions()->trace(OMR::tacticalGlobalRegisterAllocator))

@@ -624,7 +624,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    bool opCodeIsNoOp(TR::ILOpCode &opCode); // no virt, 1 impl
    virtual bool opCodeIsNoOpOnThisPlatform(TR::ILOpCode &opCode) {return false;} // no virt
 
-   bool supportsSinglePrecisionSQRT() {return false;} // no virt
+   virtual bool supportsSinglePrecisionSQRT() {return false;} // no virt
    bool supportsFusedMultiplyAdd() {return false;} // no virt
    bool supportsNegativeFusedMultiplyAdd() {return false;} // no virt
 
@@ -711,12 +711,12 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    bool processInstruction(TR::Instruction *instr, TR_BitVector **registerUsageInfo, int32_t &blockNum, int32_t &isFence, bool traceIt) {return false;} // no virt, cast
    virtual uint32_t isPreservedRegister(int32_t regIndex) { return 0; } // no virt, cast
-   bool isReturnInstruction(TR::Instruction *instr) { return false; } // no virt, cast
+   virtual bool isReturnInstruction(TR::Instruction *instr) { return false; } // no virt, cast
    virtual bool isBranchInstruction(TR::Instruction *instr) { return false; } // no virt, cast
    int32_t isFenceInstruction(TR::Instruction *instr) { return false; } // no virt
    virtual bool isAlignmentInstruction(TR::Instruction *instr) { return false; } // no virt
    virtual bool isLabelInstruction(TR::Instruction *instr) { return false; } // no virt
-   TR::Instruction *splitEdge(TR::Instruction *cursor, bool isFallThrough, bool needsJump, TR::Instruction *newSplitLabel, TR::list<TR::Instruction*> *jmpInstrs, bool firstJump = false) { return NULL; } // no virt
+   virtual TR::Instruction *splitEdge(TR::Instruction *cursor, bool isFallThrough, bool needsJump, TR::Instruction *newSplitLabel, TR::list<TR::Instruction*> *jmpInstrs, bool firstJump = false) { return NULL; } // no virt
    virtual TR::Instruction *splitBlockEntry(TR::Instruction *instr) { return NULL; } // no virt
    virtual int32_t computeRegisterSaveDescription(TR_BitVector *regs, bool populateInfo = false) { return 0; } // no virt
    void processIncomingParameterUsage(TR_BitVector **registerUsageInfo, int32_t blockNum) { return; } // no virt
@@ -912,7 +912,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    TR_GlobalRegisterNumber getLinkageGlobalRegisterNumber(int8_t linkageRegisterIndex, TR::DataType type){ return -1; } // no virt, cast
    TR_BitVector *getGlobalGPRsPreservedAcrossCalls(){ return NULL; } // no virt, cast
-   TR_BitVector *getGlobalFPRsPreservedAcrossCalls(){ return NULL; } // no virt, cast
+   virtual TR_BitVector *getGlobalFPRsPreservedAcrossCalls(){ return NULL; } // no virt, cast
 
    int32_t getFirstBit(TR_BitVector &bv);
    TR_GlobalRegisterNumber pickRegister(TR_RegisterCandidate *, TR::Block * *, TR_BitVector & availableRegisters, TR_GlobalRegisterNumber & highRegisterNumber, TR_LinkHead<TR_RegisterCandidate> *candidates); // no virt
@@ -1222,10 +1222,10 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    TR::AheadOfTimeCompile *setAheadOfTimeCompile(TR::AheadOfTimeCompile *p) {return (_aheadOfTimeCompile = p);}
 
    // J9, X86
-   bool canTransformUnsafeCopyToArrayCopy() { return false; } // no virt
+   virtual bool canTransformUnsafeCopyToArrayCopy() { return false; } // no virt
    bool canTransformUnsafeSetMemory() { return false; }
 
-   bool canNullChkBeImplicit(TR::Node *); // no virt, cast
+   virtual bool canNullChkBeImplicit(TR::Node *); // no virt, cast
    bool canNullChkBeImplicit(TR::Node *, bool doChecks);
 
    virtual bool IsInMemoryType(TR::DataType type) { return false; }
@@ -1292,9 +1292,9 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    bool bndsChkNeedsLiteralFromPool(TR::Node *node) { return false; } // no virt
    virtual bool constLoadNeedsLiteralFromPool(TR::Node *node) { return false; } // no virt, cast
    virtual void setOnDemandLiteralPoolRun(bool answer) {} // no virt, cast
-   bool isLiteralPoolOnDemandOn () { return false; } // no virt, cast
+   virtual bool isLiteralPoolOnDemandOn () { return false; } // no virt, cast
    bool supportsOnDemandLiteralPool() { return false; } // no virt, cast
-   bool supportsDirectIntegralLoadStoresFromLiteralPool() { return false; } // no virt
+   virtual bool supportsDirectIntegralLoadStoresFromLiteralPool() { return false; } // no virt
    virtual bool supportsHighWordFacility() { return false; } // no virt, default, cast
 
    bool inlineDirectCall(TR::Node *node, TR::Register *&resultReg) { return false; }
@@ -1378,7 +1378,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    void setMappingAutomatics() {_flags1.set(MappingAutomatics);}
 
    bool getSupportsDirectJNICalls() {return _flags1.testAny(SupportsDirectJNICalls);} // no virt
-   bool supportsDirectJNICallsForAOT() { return false;} // no virt, default
+   virtual bool supportsDirectJNICallsForAOT() { return false;} // no virt, default
 
    void setSupportsDirectJNICalls() {_flags1.set(SupportsDirectJNICalls);}
 

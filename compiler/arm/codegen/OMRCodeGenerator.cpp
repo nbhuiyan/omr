@@ -654,7 +654,7 @@ void OMR::ARM::CodeGenerator::buildRegisterMapForInstruction(TR_GCStackMap *map)
 /* @@
 bool OMR::ARM::CodeGenerator::canNullChkBeImplicit(TR::Node *node)
    {
-   return self()->canNullChkBeImplicit(node, true);
+   return canNullChkBeImplicit(node, true);
    }
 */
 

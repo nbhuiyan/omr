@@ -1799,7 +1799,7 @@ void OMR::X86::CodeGenerator::doBinaryEncoding()
 
       // Insert epilogue before each RET.
       //
-      if (self()->isReturnInstruction(estimateCursor))
+      if (isReturnInstruction(estimateCursor))
          {
          if (skipOneReturn == false)
             {
