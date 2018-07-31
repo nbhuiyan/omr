@@ -853,7 +853,7 @@ OMR::Z::CodeGenerator::getGlobalGPRFromHPR (TR_GlobalRegisterNumber n)
 
 bool OMR::Z::CodeGenerator::prepareForGRA()
    {
-   bool enableHighWordGRA = supportsHighWordFacility() && !comp()->getOption(TR_DisableHighWordRA);
+   bool enableHighWordGRA = supportsHighWordFacility() && !self()->comp()->getOption(TR_DisableHighWordRA);
    bool enableVectorGRA = self()->getSupportsVectorRegisters() && !self()->comp()->getOption(TR_DisableVectorRegGRA);
 
    if (!_globalRegisterTable)
@@ -2685,7 +2685,7 @@ OMR::Z::CodeGenerator::doRegisterAssignment(TR_RegisterKinds kindsToAssign)
       if (self()->getDebug())
          {
          TR_RegisterKinds rks = (TR_RegisterKinds)(TR_GPR_Mask | TR_FPR_Mask | TR_VRF_Mask);
-         if (supportsHighWordFacility() && !comp()->getOption(TR_DisableHighWordRA))
+         if (supportsHighWordFacility() && !self()->comp()->getOption(TR_DisableHighWordRA))
             rks = (TR_RegisterKinds) ((int)rks | TR_HPR_Mask);
 
          self()->getDebug()->startTracingRegisterAssignment("backward", rks);
@@ -2694,7 +2694,7 @@ OMR::Z::CodeGenerator::doRegisterAssignment(TR_RegisterKinds kindsToAssign)
 
    // pre-pass to set all internal control flow reg deps to 64bit regs
    TR::Instruction * currInst = instructionCursor;
-   if (supportsHighWordFacility() && !comp()->getOption(TR_DisableHighWordRA) && TR::Compiler->target.is64Bit())
+   if (supportsHighWordFacility() && !self()->comp()->getOption(TR_DisableHighWordRA) && TR::Compiler->target.is64Bit())
       {
       while (currInst)
          {
@@ -2774,7 +2774,7 @@ OMR::Z::CodeGenerator::doRegisterAssignment(TR_RegisterKinds kindsToAssign)
 
       self()->tracePreRAInstruction(instructionCursor);
 
-      if (supportsHighWordFacility() && !comp()->getOption(TR_DisableHighWordRA) && !comp()->getOption(TR_DisableHPRUpgrade))
+      if (supportsHighWordFacility() && !self()->comp()->getOption(TR_DisableHighWordRA) && !self()->comp()->getOption(TR_DisableHPRUpgrade))
          {
          TR::Instruction * newInst = self()->upgradeToHPRInstruction(instructionCursor);
          if (newInst)
@@ -2782,7 +2782,7 @@ OMR::Z::CodeGenerator::doRegisterAssignment(TR_RegisterKinds kindsToAssign)
             instructionCursor = newInst;
             }
          }
-      if (supportsHighWordFacility() && comp()->getOption(TR_DisableHighWordRA))
+      if (supportsHighWordFacility() && self()->comp()->getOption(TR_DisableHighWordRA))
          self()->setAvailableHPRSpillMask(0xffff0000);
 
       prevInstruction = instructionCursor->getPrev();
@@ -7157,7 +7157,7 @@ OMR::Z::CodeGenerator::gprClobberEvaluate(TR::Node * node, bool force_copy, bool
             else
                loadRegOpCode = TR::InstOpCode::LR;
             }
-         if (supportsHighWordFacility() && !comp()->getOption(TR_DisableHighWordRA) && TR::Compiler->target.is64Bit())
+         if (supportsHighWordFacility() && !self()->comp()->getOption(TR_DisableHighWordRA) && TR::Compiler->target.is64Bit())
             {
             loadRegOpCode = TR::InstOpCode::getLoadRegOpCodeFromNode(self(), node);
             if (srcRegister->is64BitReg())
@@ -9319,7 +9319,7 @@ OMR::Z::CodeGenerator::buildRegisterMapForInstruction(TR_GCStackMap * map)
    TR::GCStackAtlas * atlas = self()->getStackAtlas();
 
 
-   if (supportsHighWordFacility() && !comp()->getOption(TR_DisableHighWordRA))
+   if (supportsHighWordFacility() && !self()->comp()->getOption(TR_DisableHighWordRA))
       {
       for (int32_t i = TR::RealRegister::FirstHPR; i <= TR::RealRegister::LastHPR; i++)
          {
