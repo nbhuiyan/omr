@@ -932,7 +932,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    int32_t getMaximumNumbersOfAssignableFPRs() { return INT_MAX; } // no virt, cast
    virtual int32_t getMaximumNumbersOfAssignableVRs()  { return INT_MAX; } // no virt, cast
    virtual bool willBeEvaluatedAsCallByCodeGen(TR::Node *node, TR::Compilation *comp){ return true;}
-   bool isGlobalRegisterAvailable(TR_GlobalRegisterNumber, TR::DataType) { return true; } // no virt
+   virtual bool isGlobalRegisterAvailable(TR_GlobalRegisterNumber, TR::DataType) { return true; } // no virt
 
    bool areAssignableGPRsScarce(); // no virt, 1 impl
 
