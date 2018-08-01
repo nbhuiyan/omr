@@ -1727,7 +1727,7 @@ OMR::CodeGenerator::pickRegister(TR_RegisterCandidate     *rc,
                {
                if (!remainingRegisters.isSet(i))
                   {
-                  TR_GlobalRegisterNumber highWordReg = self()->getGlobalHPRFromGPR(i);
+                  TR_GlobalRegisterNumber highWordReg = getGlobalHPRFromGPR(i);
                   if (self()->traceSimulateTreeEvaluation())
                      {
                      traceMsg(self()->comp(), "            %s is not available, rejecting %s\n",

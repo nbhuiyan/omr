@@ -845,7 +845,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    TR_GlobalRegisterNumber getLastGlobalHPR() {return _lastGlobalHPR;}
    TR_GlobalRegisterNumber setLastGlobalHPR(TR_GlobalRegisterNumber n) {return (_lastGlobalHPR = n);}
 
-   TR_GlobalRegisterNumber getGlobalHPRFromGPR (TR_GlobalRegisterNumber n) {return 0;} // no virt, cast
+   virtual TR_GlobalRegisterNumber getGlobalHPRFromGPR (TR_GlobalRegisterNumber n) {return 0;} // no virt, cast
    TR_GlobalRegisterNumber getGlobalGPRFromHPR (TR_GlobalRegisterNumber n) {return 0;} // no virt
 
    TR_GlobalRegisterNumber getFirstGlobalFPR() {return _lastGlobalGPR + 1;}
