@@ -298,7 +298,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    TR::TreeTop *lowerTree(TR::Node *root, TR::TreeTop *tt);
    void lowerTrees();
-   void lowerTreesWalk(TR::Node * parent, TR::TreeTop * treeTop, vcount_t visitCount);
+   virtual void lowerTreesWalk(TR::Node * parent, TR::TreeTop * treeTop, vcount_t visitCount);
 
    void lowerTreeIfNeeded(TR::Node *node, int32_t childNumber, TR::Node *parent, TR::TreeTop *tt);
 
@@ -625,7 +625,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    virtual bool opCodeIsNoOpOnThisPlatform(TR::ILOpCode &opCode) {return false;} // no virt
 
    virtual bool supportsSinglePrecisionSQRT() {return false;} // no virt
-   bool supportsFusedMultiplyAdd() {return false;} // no virt
+   virtual bool supportsFusedMultiplyAdd() {return false;} // no virt
    bool supportsNegativeFusedMultiplyAdd() {return false;} // no virt
 
    bool supportsComplexAddressing() {return false;} // no virt
@@ -926,7 +926,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    virtual int32_t getMaximumNumberOfGPRsAllowedAcrossEdge(TR::Node *) { return INT_MAX; } // no virt
    virtual int32_t getMaximumNumberOfFPRsAllowedAcrossEdge(TR::Node *) { return INT_MAX; } // no virt
-   int32_t getMaximumNumberOfVRFsAllowedAcrossEdge(TR::Node *) { return INT_MAX; } // no virt
+   virtual int32_t getMaximumNumberOfVRFsAllowedAcrossEdge(TR::Node *) { return INT_MAX; } // no virt
    virtual int32_t getMaximumNumberOfGPRsAllowedAcrossEdge(TR::Block *block); // no virt
    virtual int32_t getMaximumNumbersOfAssignableGPRs() { return INT_MAX; } // no virt, cast
    int32_t getMaximumNumbersOfAssignableFPRs() { return INT_MAX; } // no virt, cast
@@ -944,7 +944,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    virtual bool considerTypeForGRA(TR::DataType dt) {return true;} // no virt
    virtual bool considerTypeForGRA(TR::SymbolReference *symRef) {return true;} // no virt
 
-   void enableLiteralPoolRegisterForGRA () {} // no virt
+   virtual void enableLiteralPoolRegisterForGRA () {} // no virt
    virtual bool excludeInvariantsFromGRAEnabled() { return false; } // no virt
 
    TR_BitVector *getBlocksWithCalls();
@@ -1289,7 +1289,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    // symbol reference requires entry in the literal pool
    virtual bool arithmeticNeedsLiteralFromPool(TR::Node *node) { return false; } // no virt
    virtual bool bitwiseOpNeedsLiteralFromPool(TR::Node *parent, TR::Node *child) { return false; } // no virt
-   bool bndsChkNeedsLiteralFromPool(TR::Node *node) { return false; } // no virt
+   virtual bool bndsChkNeedsLiteralFromPool(TR::Node *node) { return false; } // no virt
    virtual bool constLoadNeedsLiteralFromPool(TR::Node *node) { return false; } // no virt, cast
    virtual void setOnDemandLiteralPoolRun(bool answer) {} // no virt, cast
    virtual bool isLiteralPoolOnDemandOn () { return false; } // no virt, cast
