@@ -405,7 +405,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    // Code Generator Phases
    //
    void generateCode();
-   void doRegisterAssignment(TR_RegisterKinds kindsToAssign) = 0;  // no virt
+   virtual void doRegisterAssignment(TR_RegisterKinds kindsToAssign) = 0;  // no virt
    void doBinaryEncoding(); // no virt, no cast
    void doPeephole() { return; } // no virt, no cast, default avail
    bool hasComplexAddressingMode() { return false; } // no virt, default
