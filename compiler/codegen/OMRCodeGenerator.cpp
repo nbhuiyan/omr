@@ -2329,7 +2329,7 @@ OMR::CodeGenerator::setEstimatedLocationsForSnippetLabels(int32_t estimatedSnipp
 
    if (hasTargetAddressSnippets())
       {
-      estimatedSnippetStart = self()->setEstimatedLocationsForTargetAddressSnippetLabels(estimatedSnippetStart);
+      estimatedSnippetStart = setEstimatedLocationsForTargetAddressSnippetLabels(estimatedSnippetStart);
       }
 
    for (auto iterator = _snippetList.begin(); iterator != _snippetList.end(); ++iterator)

@@ -308,7 +308,7 @@ OMR::CodeGenerator::buildGCMapForInstruction(TR::Instruction *instr)
 
    // Build the register map
    //
-   self()->buildRegisterMapForInstruction(map);
+   buildRegisterMapForInstruction(map);
    return map;
    }
 

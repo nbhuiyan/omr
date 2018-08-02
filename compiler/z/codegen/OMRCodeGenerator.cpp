@@ -6667,10 +6667,10 @@ OMR::Z::CodeGenerator::getLinkageGlobalRegisterNumber(int8_t linkageRegisterInde
 
    else
       {
-//      traceMsg(self()->comp(), "lastLinkageGPR = %d linkaeRegisterIndex = %d  getGlobalRegisterNumber(getS390Linkage()->getIntegerArgumentRegister(linkageRegisterIndex)-1) = %d\n",machine()->getLastLinkageGPR(),linkageRegisterIndex, self()->getGlobalRegisterNumber(getS390Linkage()->getIntegerArgumentRegister(linkageRegisterIndex)-1));
+//      traceMsg(self()->comp(), "lastLinkageGPR = %d linkaeRegisterIndex = %d  getGlobalRegisterNumber(getS390Linkage()->getIntegerArgumentRegister(linkageRegisterIndex)-1) = %d\n",machine()->getLastLinkageGPR(),linkageRegisterIndex, getGlobalRegisterNumber(getS390Linkage()->getIntegerArgumentRegister(linkageRegisterIndex)-1));
 //      traceMsg(self()->comp(), "getS390Linkage()->getIntegerArgumentRegister(linkageRegisterIndex) = %d\n",getS390Linkage()->getIntegerArgumentRegister(linkageRegisterIndex));
 
-      result = self()->getGlobalRegisterNumber(self()->getS390Linkage()->getIntegerArgumentRegister(linkageRegisterIndex)-1);
+      result = getGlobalRegisterNumber(self()->getS390Linkage()->getIntegerArgumentRegister(linkageRegisterIndex)-1);
       }
 
 

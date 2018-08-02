@@ -406,8 +406,8 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    //
    void generateCode();
    virtual void doRegisterAssignment(TR_RegisterKinds kindsToAssign) = 0;  // no virt
-   void doBinaryEncoding(); // no virt, no cast
-   void doPeephole() { return; } // no virt, no cast, default avail
+   virtual void doBinaryEncoding() = 0; // no virt, no cast
+   virtual void doPeephole() { return; } // no virt, no cast, default avail
    bool hasComplexAddressingMode() { return false; } // no virt, default
    void removeUnusedLocals();
 
@@ -628,7 +628,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    virtual bool supportsFusedMultiplyAdd() {return false;} // no virt
    bool supportsNegativeFusedMultiplyAdd() {return false;} // no virt
 
-   bool supportsComplexAddressing() {return false;} // no virt
+   virtual bool supportsComplexAddressing() {return false;} // no virt
    virtual bool canBeAffectedByStoreTagStalls() { return false; } // no virt, default
 
    bool isMaterialized(TR::Node *); // no virt, cast
@@ -684,7 +684,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    // --------------------------------------------------------------------------
    // Behaviour on a particular arch, not code generator
    //
-   bool supportsLongRegAllocation() {return false;}  // no virt
+   virtual bool supportsLongRegAllocation() {return false;}  // no virt
 
    // --------------------------------------------------------------------------
    // GC
@@ -696,7 +696,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    void addToAtlas(TR::Instruction *);
    void buildGCMapsForInstructionAndSnippet(TR::Instruction *instr);
    TR_GCStackMap *buildGCMapForInstruction(TR::Instruction *instr);
-   void buildRegisterMapForInstruction(TR_GCStackMap *map);
+   virtual void buildRegisterMapForInstruction(TR_GCStackMap *map) = 0;
    // IA32 only?
    virtual uint32_t getRegisterMapInfoBitsMask() {return 0;} // no virt, cast
 
@@ -834,7 +834,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    uint32_t getGlobalRegister(TR_GlobalRegisterNumber n) {return _globalRegisterTable[n];}
    uint32_t *setGlobalRegisterTable(uint32_t *p) {return (_globalRegisterTable = p);}
 
-   TR_GlobalRegisterNumber getGlobalRegisterNumber(uint32_t realReg) { return -1; } // no virt, cast
+   virtual TR_GlobalRegisterNumber getGlobalRegisterNumber(uint32_t realReg) { return -1; } // no virt, cast
 
    TR_GlobalRegisterNumber getFirstGlobalGPR() {return 0;}
    TR_GlobalRegisterNumber getLastGlobalGPR()  {return _lastGlobalGPR;}
@@ -846,7 +846,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    TR_GlobalRegisterNumber setLastGlobalHPR(TR_GlobalRegisterNumber n) {return (_lastGlobalHPR = n);}
 
    virtual TR_GlobalRegisterNumber getGlobalHPRFromGPR (TR_GlobalRegisterNumber n) {return 0;} // no virt, cast
-   TR_GlobalRegisterNumber getGlobalGPRFromHPR (TR_GlobalRegisterNumber n) {return 0;} // no virt
+   virtual TR_GlobalRegisterNumber getGlobalGPRFromHPR (TR_GlobalRegisterNumber n) {return 0;} // no virt
 
    TR_GlobalRegisterNumber getFirstGlobalFPR() {return _lastGlobalGPR + 1;}
    TR_GlobalRegisterNumber setFirstGlobalFPR(TR_GlobalRegisterNumber n) {return (_firstGlobalFPR = n);}
@@ -1125,7 +1125,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    //
    virtual void emitTargetAddressSnippets() {}
    virtual bool hasTargetAddressSnippets() {return false;} // no virt, cast
-   int32_t setEstimatedLocationsForTargetAddressSnippetLabels(int32_t estimatedSnippetStart) {return 0;}
+   virtual int32_t setEstimatedLocationsForTargetAddressSnippetLabels(int32_t estimatedSnippetStart) {return 0;}
 
    // --------------------------------------------------------------------------
    // Register pressure
@@ -1436,8 +1436,8 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    bool getSupportsArrayTranslateTROT() {return _flags4.testAny(SupportsArrayTranslateTROT);}
    void setSupportsArrayTranslateTROT() {_flags4.set(SupportsArrayTranslateTROT);}
 
-   bool getSupportsEncodeUtf16LittleWithSurrogateTest() { return false; }
-   bool getSupportsEncodeUtf16BigWithSurrogateTest() { return false; }
+   virtual bool getSupportsEncodeUtf16LittleWithSurrogateTest() { return false; }
+   virtual bool getSupportsEncodeUtf16BigWithSurrogateTest() { return false; }
 
    bool supportsZonedDFPConversions() {return _enabledFlags.testAny(SupportsZonedDFPConversions);}
    void setSupportsZonedDFPConversions() {_enabledFlags.set(SupportsZonedDFPConversions);}
