@@ -647,7 +647,7 @@ OMR::CodeGenerator::doInstructionSelection()
       self()->getDebug()->setupToDumpTreesAndInstructions("Performing Instruction Selection");
       }
 
-   self()->beginInstructionSelection();
+   beginInstructionSelection();
 
    {
    TR::StackMemoryRegion stackMemoryRegion(*self()->trMemory());
@@ -2390,7 +2390,7 @@ OMR::CodeGenerator::lookUpSnippet(int32_t snippetKind, TR::SymbolReference *symR
    {
    for (auto iterator = _snippetList.begin(); iterator != _snippetList.end(); ++iterator)
       {
-      if (self()->isSnippetMatched(*iterator, snippetKind, symRef))
+      if (isSnippetMatched(*iterator, snippetKind, symRef))
          return (*iterator)->getSnippetLabel();
       }
    return NULL;

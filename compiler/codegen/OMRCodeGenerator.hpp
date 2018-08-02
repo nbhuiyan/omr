@@ -314,7 +314,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    void doInstructionSelection();
    void createStackAtlas();
 
-   void beginInstructionSelection() {}
+   virtual void beginInstructionSelection() {}
    void endInstructionSelection() {}
 
    bool use64BitRegsOn32Bit();
@@ -386,7 +386,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    TR_HasRandomGenerator randomizer;
 
-   bool supportsAtomicAdd() {return false;}
+   virtual bool supportsAtomicAdd() {return false;}
    bool hasTMEvaluator()    {return false;}
 
    // --------------------------------------------------------------------------
@@ -641,7 +641,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    uint32_t getNumberBytesReadInaccessible() { return _numberBytesReadInaccessible; }
    uint32_t getNumberBytesWriteInaccessible() { return _numberBytesWriteInaccessible; }
 
-   bool codegenSupportsUnsignedIntegerDivide() {return false;} // no virt
+   virtual bool codegenSupportsUnsignedIntegerDivide() {return false;} // no virt
    virtual bool mulDecompositionCostIsJustified(int numOfOperations, char bitPosition[], char operationType[], int64_t value); // no virt
 
    virtual bool codegenSupportsLoadlessBNDCheck() {return false;} // no virt, cast
@@ -911,7 +911,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    bool is8BitGlobalGPR(TR_GlobalRegisterNumber n) {return n <= _last8BitGlobalGPR;}
 
    TR_GlobalRegisterNumber getLinkageGlobalRegisterNumber(int8_t linkageRegisterIndex, TR::DataType type){ return -1; } // no virt, cast
-   TR_BitVector *getGlobalGPRsPreservedAcrossCalls(){ return NULL; } // no virt, cast
+   virtual TR_BitVector *getGlobalGPRsPreservedAcrossCalls(){ return NULL; } // no virt, cast
    virtual TR_BitVector *getGlobalFPRsPreservedAcrossCalls(){ return NULL; } // no virt, cast
 
    int32_t getFirstBit(TR_BitVector &bv);
@@ -973,7 +973,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    static void incNumRematerializedXMMRs()     {_totalNumRematerializedXMMRs++;}
 #endif
 
-   void dumpDataSnippets(TR::FILE *outFile) {}
+   virtual void dumpDataSnippets(TR::FILE *outFile) {}
    virtual void dumpTargetAddressSnippets(TR::FILE *outFile) {}
 
    // --------------------------------------------------------------------------
@@ -1089,8 +1089,8 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    virtual void apply16BitLabelRelativeRelocation(int32_t * cursor, TR::LabelSymbol * label,int8_t d, bool isInstrOffset = false); // no virt
    virtual void apply24BitLabelRelativeRelocation(int32_t * cursor, TR::LabelSymbol *); // no virt
    void apply16BitLoadLabelRelativeRelocation(TR::Instruction *, TR::LabelSymbol *, TR::LabelSymbol *, int32_t); // no virt
-   void apply32BitLoadLabelRelativeRelocation(TR::Instruction *, TR::LabelSymbol *, TR::LabelSymbol *, int32_t);  // no virt
-   void apply64BitLoadLabelRelativeRelocation(TR::Instruction *, TR::LabelSymbol *); // no virt
+   virtual void apply32BitLoadLabelRelativeRelocation(TR::Instruction *, TR::LabelSymbol *, TR::LabelSymbol *, int32_t);  // no virt
+   virtual void apply64BitLoadLabelRelativeRelocation(TR::Instruction *, TR::LabelSymbol *); // no virt
    virtual void apply32BitLabelRelativeRelocation(int32_t * cursor, TR::LabelSymbol *); // no virt
    virtual void apply32BitLabelTableRelocation(int32_t * cursor, TR::LabelSymbol *); // no virt
 
@@ -1111,7 +1111,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    // Local snippet sharing facility: most RISC platforms can make use of it. The platform
    // specific code generators should override isSnippetMatched if they choose to use it.
    TR::LabelSymbol * lookUpSnippet(int32_t snippetKind, TR::SymbolReference *symRef);
-   bool isSnippetMatched(TR::Snippet *snippet, int32_t snippetKind, TR::SymbolReference *symRef) {return false;} // no virt, cast
+   virtual bool isSnippetMatched(TR::Snippet *snippet, int32_t snippetKind, TR::SymbolReference *symRef) {return false;} // no virt, cast
 
    // called to emit any constant data snippets.  The platform specific code generators
    // should override these methods if they use constant data snippets.
@@ -1207,7 +1207,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    virtual bool isRotateAndMask(TR::Node *node) { return false; } // no virt
 
    virtual TR::Instruction *generateNop(TR::Node *node, TR::Instruction *instruction=0, TR_NOPKind nopKind=TR_NOPStandard); // no virt, cast
-   bool isOutOfLineHotPath() { TR_ASSERT(0, "isOutOfLineHotPath is only implemented for 390 and ppc"); return false;} // no virt
+   virtual bool isOutOfLineHotPath() { TR_ASSERT(0, "isOutOfLineHotPath is only implemented for 390 and ppc"); return false;} // no virt
 
    //Rather confusingly not used -only- in BCD related codegen.
    //... has leaked into non-BCD code.
@@ -1293,7 +1293,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    virtual bool constLoadNeedsLiteralFromPool(TR::Node *node) { return false; } // no virt, cast
    virtual void setOnDemandLiteralPoolRun(bool answer) {} // no virt, cast
    virtual bool isLiteralPoolOnDemandOn () { return false; } // no virt, cast
-   bool supportsOnDemandLiteralPool() { return false; } // no virt, cast
+   virtual bool supportsOnDemandLiteralPool() { return false; } // no virt, cast
    virtual bool supportsDirectIntegralLoadStoresFromLiteralPool() { return false; } // no virt
    virtual bool supportsHighWordFacility() { return false; } // no virt, default, cast
 

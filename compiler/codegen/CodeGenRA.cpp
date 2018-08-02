@@ -1905,7 +1905,7 @@ OMR::CodeGenerator::pickRegister(TR_RegisterCandidate     *rc,
           )
          preservedRegisters = getGlobalFPRsPreservedAcrossCalls();
       else
-         preservedRegisters = self()->getGlobalGPRsPreservedAcrossCalls();
+         preservedRegisters = getGlobalGPRsPreservedAcrossCalls();
       if (debug("tracePickRegister") || self()->comp()->getOptions()->trace(OMR::tacticalGlobalRegisterAllocator))
          {
          traceMsg(self()->comp(), "pickRegister:\tPreserved register info is %spresent\n", preservedRegisters? "" : "NOT ");

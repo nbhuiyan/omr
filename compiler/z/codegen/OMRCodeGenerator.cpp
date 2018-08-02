@@ -8376,7 +8376,7 @@ OMR::Z::CodeGenerator::CreateTargetAddressSnippet(TR::Node * node, TR::LabelSymb
 TR::S390TargetAddressSnippet *
 OMR::Z::CodeGenerator::CreateTargetAddressSnippet(TR::Node * node, TR::Symbol * s)
    {
-   TR_ASSERT(self()->supportsOnDemandLiteralPool() == false, "May not be here with Literal Pool On Demand enabled\n");
+   TR_ASSERT(supportsOnDemandLiteralPool() == false, "May not be here with Literal Pool On Demand enabled\n");
    TR::S390TargetAddressSnippet * targetsnippet;
    targetsnippet = new (self()->trHeapMemory()) TR::S390TargetAddressSnippet(self(), node, s);
    _targetList.push_front(targetsnippet);
@@ -8386,7 +8386,7 @@ OMR::Z::CodeGenerator::CreateTargetAddressSnippet(TR::Node * node, TR::Symbol * 
 TR::S390TargetAddressSnippet *
 OMR::Z::CodeGenerator::findOrCreateTargetAddressSnippet(TR::Node * node, uintptrj_t addr)
    {
-   TR_ASSERT(self()->supportsOnDemandLiteralPool() == false, "May not be here with Literal Pool On Demand enabled\n");
+   TR_ASSERT(supportsOnDemandLiteralPool() == false, "May not be here with Literal Pool On Demand enabled\n");
    // A simple linear search should suffice for now since the number of FP constants
    // produced is typically very small.  Eventually, this should be implemented as an
    // ordered list or a hash table.
