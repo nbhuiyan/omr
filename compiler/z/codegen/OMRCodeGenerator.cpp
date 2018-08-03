@@ -11018,7 +11018,7 @@ bool OMR::Z::CodeGenerator::reliesOnAParticularSignEncoding(TR::Node *node)
       return false;
 
    // left shifts do not rely on a clean sign so the only thing to check is if a clean sign property has been propagated thru it (if not then can return false)
-   if (node->getType().isBCD() && op.isLeftShift() && !self()->propagateSignThroughBCDLeftShift(node->getType()))
+   if (node->getType().isBCD() && op.isLeftShift() && !propagateSignThroughBCDLeftShift(node->getType()))
       return false;
 
    if (node->getType().isBCD() && op.isRightShift())
