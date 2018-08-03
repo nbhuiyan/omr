@@ -390,7 +390,7 @@ OMR::CodeGenerator::lowerTreesWalk(TR::Node * parent, TR::TreeTop * treeTop, vco
 
    parent->setVisitCount(visitCount);
 
-   self()->lowerTreesPreChildrenVisit(parent, treeTop, visitCount);
+   lowerTreesPreChildrenVisit(parent, treeTop, visitCount);
 
    // Go through the subtrees and lower any nodes that need to be lowered. This
    // involves a call to the VM to replace the trees with other trees.

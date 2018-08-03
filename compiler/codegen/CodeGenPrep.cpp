@@ -97,7 +97,7 @@
 void
 OMR::CodeGenerator::lowerTreesPreChildrenVisit(TR::Node * parent, TR::TreeTop * treeTop, vcount_t visitCount)
    {
-   self()->lowerTreesPropagateBlockToNode(parent);
+   lowerTreesPropagateBlockToNode(parent);
 
    static const char * disableILMulPwr2Opt = feGetEnv("TR_DisableILMulPwr2Opt");
 

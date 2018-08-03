@@ -370,7 +370,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator : public OMR::CodeGenerator
    void reserveNTrampolines(int32_t numTrampolines) { return; }
 
    // Note: This leaves the code aligned in the specified manner.
-   TR::Instruction *generateSwitchToInterpreterPrePrologue(TR::Instruction *prev, uint8_t alignment, uint8_t alignmentMargin);
+   virtual TR::Instruction *generateSwitchToInterpreterPrePrologue(TR::Instruction *prev, uint8_t alignment, uint8_t alignmentMargin);
 
    int32_t setEstimatedLocationsForDataSnippetLabels(int32_t estimatedSnippetStart);
    void emitDataSnippets();

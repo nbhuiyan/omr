@@ -191,7 +191,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator : public OMR::CodeGenerator
    void emitDataSnippets();
    bool hasDataSnippets();
 
-   TR::Instruction *generateSwitchToInterpreterPrePrologue(TR::Instruction *cursor, TR::Node *node);
+   virtual TR::Instruction *generateSwitchToInterpreterPrePrologue(TR::Instruction *cursor, TR::Node *node);
 
    int32_t setEstimatedLocationsForDataSnippetLabels(int32_t estimatedSnippetStart);
 
