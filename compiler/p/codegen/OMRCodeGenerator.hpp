@@ -171,7 +171,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator : public OMR::CodeGenerator
 
    bool getSupportsIbyteswap();
 
-   void generateBinaryEncodingPrologue(TR_PPCBinaryEncodingData *data);
+   virtual void generateBinaryEncodingPrologue(TR_PPCBinaryEncodingData *data);
 
    void beginInstructionSelection();
    void endInstructionSelection();
