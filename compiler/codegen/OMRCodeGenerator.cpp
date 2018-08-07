@@ -373,7 +373,7 @@ void OMR::CodeGenerator::lowerTrees()
 
       // If the tree needs to be lowered, call the VM to lower it
       //
-      self()->lowerTreeIfNeeded(node, 0, 0, tt);
+      lowerTreeIfNeeded(node, 0, 0, tt);
 
 
       self()->lowerTreesPostTreeTopVisit(tt, visitCount);
@@ -404,7 +404,7 @@ OMR::CodeGenerator::lowerTreesWalk(TR::Node * parent, TR::TreeTop * treeTop, vco
       if (child->getVisitCount() != visitCount)
          {
          lowerTreesWalk(child, treeTop, visitCount);
-         self()->lowerTreeIfNeeded(child, childCount, parent, treeTop);
+         lowerTreeIfNeeded(child, childCount, parent, treeTop);
          }
       }
 

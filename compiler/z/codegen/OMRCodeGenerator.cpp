@@ -176,7 +176,7 @@ OMR::Z::CodeGenerator::lowerTreesWalk(TR::Node * parent, TR::TreeTop * treeTop, 
       if (child->getVisitCount() != visitCount)
          {
          lowerTreesWalk(child, treeTop, visitCount);
-         self()->lowerTreeIfNeeded(child, childCount, parent, treeTop);
+         lowerTreeIfNeeded(child, childCount, parent, treeTop);
          }
 
       self()->checkIsUnneededIALoad(parent, child, treeTop);

@@ -300,7 +300,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    void lowerTrees();
    virtual void lowerTreesWalk(TR::Node * parent, TR::TreeTop * treeTop, vcount_t visitCount);
 
-   void lowerTreeIfNeeded(TR::Node *node, int32_t childNumber, TR::Node *parent, TR::TreeTop *tt);
+   virtual void lowerTreeIfNeeded(TR::Node *node, int32_t childNumber, TR::Node *parent, TR::TreeTop *tt);
 
    void lowerTreesPreTreeTopVisit(TR::TreeTop *tt, vcount_t visitCount);
    void lowerTreesPostTreeTopVisit(TR::TreeTop *tt, vcount_t visitCount);
@@ -378,9 +378,9 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    virtual int32_t getNextAvailableBlockIndex() { return -1; }
 
    bool supportsMethodEntryPadding() { return true; }
-   bool mustGenerateSwitchToInterpreterPrePrologue() { return false; }
+   virtual bool mustGenerateSwitchToInterpreterPrePrologue() { return false; }
    bool buildInterpreterEntryPoint() { return false; }
-   void generateCatchBlockBBStartPrologue(TR::Node *node, TR::Instruction *fenceInstruction) { return; }
+   virtual void generateCatchBlockBBStartPrologue(TR::Node *node, TR::Instruction *fenceInstruction) { return; }
    virtual bool supportsUnneededLabelRemoval() { return true; }
    virtual bool allowSplitWarmAndColdBlocks() { return false; }
 
