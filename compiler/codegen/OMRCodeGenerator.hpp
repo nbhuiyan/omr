@@ -419,7 +419,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    void prepareNodeForInstructionSelection(TR::Node*node);
    void remapGCIndicesInInternalPtrFormat();
-   void processRelocations();
+   virtual void processRelocations();
 
    void findAndFixCommonedReferences();
    void findCommonedReferences(TR::Node*node, TR::TreeTop *treeTop);
@@ -540,7 +540,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    void cleanupFlags(TR::Node*node);
 
    virtual bool shouldYankCompressedRefs() { return false; } // no virt, default, cast
-   bool materializesHeapBase() { return true; } // no virt, default, cast
+   virtual bool materializesHeapBase() { return true; } // no virt, default, cast
    virtual bool canFoldLargeOffsetInAddressing() { return false; } // no virt, default, cast
 
    void insertDebugCounters();
@@ -612,7 +612,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    virtual uint8_t getSizeOfCombinedBuffer() {return 0;} // no virt, default
 
-   bool doRematerialization() {return false;} // no virt, default
+   virtual bool doRematerialization() {return false;} // no virt, default
 
    // --------------------------------------------------------------------------
    // Architecture, not code generator
@@ -626,7 +626,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    virtual bool supportsSinglePrecisionSQRT() {return false;} // no virt
    virtual bool supportsFusedMultiplyAdd() {return false;} // no virt
-   bool supportsNegativeFusedMultiplyAdd() {return false;} // no virt
+   virtual bool supportsNegativeFusedMultiplyAdd() {return false;} // no virt
 
    virtual bool supportsComplexAddressing() {return false;} // no virt
    virtual bool canBeAffectedByStoreTagStalls() { return false; } // no virt, default
@@ -1194,7 +1194,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    virtual void jitAddPicToPatchOnClassUnload(void *classPointer, void *addressToBePatched) {}
    virtual void jitAdd32BitPicToPatchOnClassUnload(void *classPointer, void *addressToBePatched) {}
-   void jitAddPicToPatchOnClassRedefinition(void *classPointer, void *addressToBePatched, bool unresolved = false) {}
+   virtual void jitAddPicToPatchOnClassRedefinition(void *classPointer, void *addressToBePatched, bool unresolved = false) {}
    void jitAdd32BitPicToPatchOnClassRedefinition(void *classPointer, void *addressToBePatched, bool unresolved = false) {}
    virtual void jitAddUnresolvedAddressMaterializationToPatchOnClassRedefinition(void *firstInstruction) {} //J9
    bool wantToPatchClassPointer(const TR_OpaqueClassBlock *allegedClassPointer, const TR::Node *forNode) { return false; } //J9
