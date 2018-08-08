@@ -507,7 +507,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator : public OMR::CodeGenerator
 
    bool patchableRangeNeedsAlignment(void *cursor, intptrj_t length, intptrj_t boundary, intptrj_t margin=0);
 
-   bool nopsAlsoProcessedByRelocations() { return false; }
+   virtual bool nopsAlsoProcessedByRelocations() { return false; }
 
 #if defined(DEBUG)
    void dumpPreFPRegisterAssignment(TR::Instruction *);
