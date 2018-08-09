@@ -379,7 +379,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    bool supportsMethodEntryPadding() { return true; }
    virtual bool mustGenerateSwitchToInterpreterPrePrologue() { return false; }
-   bool buildInterpreterEntryPoint() { return false; }
+   virtual bool buildInterpreterEntryPoint() { return false; }
    virtual void generateCatchBlockBBStartPrologue(TR::Node *node, TR::Instruction *fenceInstruction) { return; }
    virtual bool supportsUnneededLabelRemoval() { return true; }
    virtual bool allowSplitWarmAndColdBlocks() { return false; }
@@ -709,7 +709,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    int32_t getLowestSavedRegister() {return _lowestSavedReg;}
    void setLowestSavedRegister(int32_t v) {_lowestSavedReg = v;}
 
-   bool processInstruction(TR::Instruction *instr, TR_BitVector **registerUsageInfo, int32_t &blockNum, int32_t &isFence, bool traceIt) {return false;} // no virt, cast
+   virtual bool processInstruction(TR::Instruction *instr, TR_BitVector **registerUsageInfo, int32_t &blockNum, int32_t &isFence, bool traceIt) {return false;} // no virt, cast
    virtual uint32_t isPreservedRegister(int32_t regIndex) { return 0; } // no virt, cast
    virtual bool isReturnInstruction(TR::Instruction *instr) { return false; } // no virt, cast
    virtual bool isBranchInstruction(TR::Instruction *instr) { return false; } // no virt, cast
@@ -938,7 +938,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    TR_Array<TR::Register *>& getRegisterArray() {return _registerArray;}
 
-   bool needToAvoidCommoningInGRA() {return false;} // no virt
+   virtual bool needToAvoidCommoningInGRA() {return false;} // no virt
 
    virtual bool considerTypeForGRA(TR::Node *node) {return true;} // no virt
    virtual bool considerTypeForGRA(TR::DataType dt) {return true;} // no virt
@@ -1552,7 +1552,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    virtual bool isAddressScaleIndexSupported(int32_t scale) { return false; } // no virt
 
-   bool getSupportsConstantOffsetInAddressing(int64_t value);
+   virtual bool getSupportsConstantOffsetInAddressing(int64_t value);
    bool getSupportsConstantOffsetInAddressing() { return _flags3.testAny(SupportsConstantOffsetInAddressing); }
    void setSupportsConstantOffsetInAddressing() { _flags3.set(SupportsConstantOffsetInAddressing); }
 
