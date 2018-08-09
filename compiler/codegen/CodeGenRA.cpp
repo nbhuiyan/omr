@@ -1677,7 +1677,7 @@ OMR::CodeGenerator::pickRegister(TR_RegisterCandidate     *rc,
          int8_t lri = rcSymbol->getParmSymbol()->getLinkageRegisterIndex();
          if (lri >= 0)
             {
-            linkageRegister = self()->getLinkageGlobalRegisterNumber(lri, dtype);
+            linkageRegister = getLinkageGlobalRegisterNumber(lri, dtype);
             }
          }
       if (linkageRegister == -1)
@@ -1876,7 +1876,7 @@ OMR::CodeGenerator::pickRegister(TR_RegisterCandidate     *rc,
          int8_t lri = rcSymbol->getParmSymbol()->getLinkageRegisterIndex();
          if (lri >= 0)
             {
-            linkageRegister = self()->getLinkageGlobalRegisterNumber(lri, rcSymbol->getDataType());
+            linkageRegister = getLinkageGlobalRegisterNumber(lri, rcSymbol->getDataType());
             }
          }
       if (debug("tracePickRegister") || self()->comp()->getOptions()->trace(OMR::tacticalGlobalRegisterAllocator))

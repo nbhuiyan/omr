@@ -302,7 +302,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    virtual void lowerTreeIfNeeded(TR::Node *node, int32_t childNumber, TR::Node *parent, TR::TreeTop *tt);
 
-   void lowerTreesPreTreeTopVisit(TR::TreeTop *tt, vcount_t visitCount);
+   virtual void lowerTreesPreTreeTopVisit(TR::TreeTop *tt, vcount_t visitCount);
    void lowerTreesPostTreeTopVisit(TR::TreeTop *tt, vcount_t visitCount);
 
    virtual void lowerTreesPreChildrenVisit(TR::Node * parent, TR::TreeTop * treeTop, vcount_t visitCount);
@@ -508,7 +508,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    // Capabilities
    //
    virtual bool supports32bitAiadd() {return true;}  // no virt, default
-   bool supportsMergingGuards() {return false;} // no virt, default
+   virtual bool supportsMergingGuards() {return false;} // no virt, default
 
    // --------------------------------------------------------------------------
    // Z only
@@ -535,7 +535,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    // Lower trees
    //
    void rematerializeCmpUnderTernary(TR::Node*node);
-   bool yankIndexScalingOp() {return false;} // no virt, default
+   virtual bool yankIndexScalingOp() {return false;} // no virt, default
 
    void cleanupFlags(TR::Node*node);
 
@@ -719,7 +719,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
    virtual TR::Instruction *splitEdge(TR::Instruction *cursor, bool isFallThrough, bool needsJump, TR::Instruction *newSplitLabel, TR::list<TR::Instruction*> *jmpInstrs, bool firstJump = false) { return NULL; } // no virt
    virtual TR::Instruction *splitBlockEntry(TR::Instruction *instr) { return NULL; } // no virt
    virtual int32_t computeRegisterSaveDescription(TR_BitVector *regs, bool populateInfo = false) { return 0; } // no virt
-   void processIncomingParameterUsage(TR_BitVector **registerUsageInfo, int32_t blockNum) { return; } // no virt
+   virtual void processIncomingParameterUsage(TR_BitVector **registerUsageInfo, int32_t blockNum) { return; } // no virt
    virtual void updateSnippetMapWithRSD(TR::Instruction *cur, int32_t rsd) { return; } // no virt
    virtual bool isTargetSnippetOrOutOfLine(TR::Instruction *instr, TR::Instruction **start, TR::Instruction **end) { return false; }
 
@@ -910,7 +910,7 @@ class /*OMR_EXTENSIBLE*/ CodeGenerator
 
    bool is8BitGlobalGPR(TR_GlobalRegisterNumber n) {return n <= _last8BitGlobalGPR;}
 
-   TR_GlobalRegisterNumber getLinkageGlobalRegisterNumber(int8_t linkageRegisterIndex, TR::DataType type){ return -1; } // no virt, cast
+   virtual TR_GlobalRegisterNumber getLinkageGlobalRegisterNumber(int8_t linkageRegisterIndex, TR::DataType type){ return -1; } // no virt, cast
    virtual TR_BitVector *getGlobalGPRsPreservedAcrossCalls(){ return NULL; } // no virt, cast
    virtual TR_BitVector *getGlobalFPRsPreservedAcrossCalls(){ return NULL; } // no virt, cast
 

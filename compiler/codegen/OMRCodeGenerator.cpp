@@ -364,7 +364,7 @@ void OMR::CodeGenerator::lowerTrees()
       TR_ASSERT(node->getVisitCount() != visitCount, "Code Gen: error in lowering trees");
       TR_ASSERT(node->getReferenceCount() == 0, "Code Gen: error in lowering trees");
 
-      self()->lowerTreesPreTreeTopVisit(tt, visitCount);
+      lowerTreesPreTreeTopVisit(tt, visitCount);
 
 
       // First lower the children
