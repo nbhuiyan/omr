@@ -182,7 +182,7 @@ OMR::Z::CodeGenerator::lowerTreesWalk(TR::Node * parent, TR::TreeTop * treeTop, 
       self()->checkIsUnneededIALoad(parent, child, treeTop);
       }
 
-   self()->lowerTreesPostChildrenVisit(parent, treeTop, visitCount);
+   lowerTreesPostChildrenVisit(parent, treeTop, visitCount);
 
    }
 

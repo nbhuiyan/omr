@@ -350,7 +350,7 @@ void OMR::CodeGenerator::lowerTrees()
    // visitCount should not be incremented until it finishes
    //
 
-   self()->preLowerTrees();
+   preLowerTrees();
 
    TR::TreeTop * tt;
    TR::Node * node;
@@ -376,7 +376,7 @@ void OMR::CodeGenerator::lowerTrees()
       lowerTreeIfNeeded(node, 0, 0, tt);
 
 
-      self()->lowerTreesPostTreeTopVisit(tt, visitCount);
+      lowerTreesPostTreeTopVisit(tt, visitCount);
 
       }
 
@@ -408,7 +408,7 @@ OMR::CodeGenerator::lowerTreesWalk(TR::Node * parent, TR::TreeTop * treeTop, vco
          }
       }
 
-   self()->lowerTreesPostChildrenVisit(parent, treeTop, visitCount);
+   lowerTreesPostChildrenVisit(parent, treeTop, visitCount);
 
    }
 
@@ -840,7 +840,7 @@ OMR::CodeGenerator::doInstructionSelection()
       self()->getDebug()->roundAddressEnumerationCounters();
       }
 
-   self()->endInstructionSelection();
+   endInstructionSelection();
 
    if (comp->getOption(TR_TraceCG))
       {
@@ -2379,7 +2379,7 @@ OMR::CodeGenerator::emitSnippets()
    //
    if (hasDataSnippets())
       {
-      self()->emitDataSnippets();
+      emitDataSnippets();
       }
 
    return retVal;
