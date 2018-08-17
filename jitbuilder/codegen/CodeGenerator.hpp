@@ -31,8 +31,8 @@ class OMR_EXTENSIBLE CodeGenerator : public ::JitBuilder::CodeGeneratorConnector
    {
    public:
 
-   CodeGenerator() :
-      ::JitBuilder::CodeGeneratorConnector() {}
+   CodeGenerator(TR::Compilation *comp) :
+      ::JitBuilder::CodeGeneratorConnector(comp) {}
    };
 }
 

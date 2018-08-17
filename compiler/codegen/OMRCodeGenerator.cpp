@@ -173,8 +173,8 @@ TR::Instruction *
 OMR::CodeGenerator::generateNop(TR::Node * node, TR::Instruction *instruction, TR_NOPKind nopKind)
     { TR_ASSERT(0, "shouldn't get here"); return NULL;}
 
-OMR::CodeGenerator::CodeGenerator() :
-      _compilation(TR::comp()),
+OMR::CodeGenerator::CodeGenerator(TR::Compilation *comp) :
+      _compilation(comp),
       _trMemory(_compilation->trMemory()),
       _liveLocals(0),
       _currentEvaluationTreeTop(0),

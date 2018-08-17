@@ -30,8 +30,8 @@ class OMR_EXTENSIBLE CodeGenerator : public ::TestCompiler::CodeGeneratorConnect
    {
    public:
 
-   CodeGenerator() :
-      ::TestCompiler::CodeGeneratorConnector() {}
+   CodeGenerator(TR::Compilation *comp) :
+      ::TestCompiler::CodeGeneratorConnector(comp) {}
    };
 }
 

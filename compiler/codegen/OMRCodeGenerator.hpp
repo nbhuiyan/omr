@@ -1657,7 +1657,7 @@ class OMR_EXTENSIBLE CodeGenerator
 
    protected:
 
-   CodeGenerator();
+   CodeGenerator(TR::Compilation *comp);
 
    enum // _flags1
       {

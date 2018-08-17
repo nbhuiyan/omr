@@ -38,7 +38,7 @@ public:
     * @param[in] comp : the TR::Compilation object
     */
    CodeGenerator(TR::Compilation *comp) :
-      OMR::CodeGeneratorConnector() {}
+      OMR::CodeGeneratorConnector(comp) {}
    };
 }
 

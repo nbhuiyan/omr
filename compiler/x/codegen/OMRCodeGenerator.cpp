@@ -481,8 +481,8 @@ OMR::X86::CodeGenerator::initialize(TR::Compilation *comp)
    }
 
 
-OMR::X86::CodeGenerator::CodeGenerator() :
-   OMR::CodeGenerator(),
+OMR::X86::CodeGenerator::CodeGenerator(TR::Compilation *comp) :
+   OMR::CodeGenerator(comp),
    _wordConversionTemp(NULL),
    _doubleWordConversionTemp(NULL),
    _currentTimeMillisTemp(NULL),

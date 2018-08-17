@@ -44,8 +44,8 @@
 #include "infra/BitVector.hpp"            // for TR_BitVector
 #include "x/codegen/X86Ops.hpp"           // for ::MOV8RegReg
 
-OMR::X86::AMD64::CodeGenerator::CodeGenerator() :
-   OMR::X86::CodeGenerator()
+OMR::X86::AMD64::CodeGenerator::CodeGenerator(TR::Compilation *comp) :
+   OMR::X86::CodeGenerator(comp)
    {
 
    if (self()->comp()->getOption(TR_DisableTraps))
