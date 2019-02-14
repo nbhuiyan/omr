@@ -192,6 +192,8 @@ const char * objectName[] =
 
    "Options",
    "OptionSet",
+   "CompilerOptions",
+   "CompilerOptionsManager",
    "OrderedExceptionHandlerIterator",
    "PCMapEntry",
    "PersistentCHTable",

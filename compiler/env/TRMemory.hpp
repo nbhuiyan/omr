@@ -339,6 +339,8 @@ public:
 
       Options,
       OptionSet,
+      CompilerOptions,
+      CompilerOptionsManager,
       OrderedExceptionHandlerIterator,
       PCMapEntry,
       PersistentCHTable,
