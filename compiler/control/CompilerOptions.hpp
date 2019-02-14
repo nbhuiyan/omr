@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2019 IBM Corp. and others
+ * Copyright (c) 2019, 2019 IBM Corp. and others
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which accompanies this
@@ -19,17 +19,28 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#include <stdint.h>
-#include "compile/CompilationTypes.hpp"
-#include "env/ConcreteFE.hpp"
+#ifndef OMR_COMPILER_OPTIONS_HPP
+#define OMR_COMPILER_OPTIONS_HPP
 
-struct OMR_VMThread;
-class TR_ResolvedMethod;
-namespace TR { class IlGeneratorMethodDetails; }
-namespace TR { class JitConfig; }
+#include "env/TRMemory.hpp"
 
-int32_t init_options(TR::JitConfig *jitConfig, char * cmdLineOptions);
-int32_t init_new_options(TR::JitConfig *jitConfig, char * cmdLineOptions);
-int32_t commonJitInit(OMR::FrontEnd &fe, char * cmdLineOptions);
-uint8_t *compileMethod(OMR_VMThread *omrVMThread, TR_ResolvedMethod &compilee, TR_Hotness hotness, int32_t &rc);
-uint8_t *compileMethodFromDetails(OMR_VMThread *omrVMThread, TR::IlGeneratorMethodDetails &details, TR_Hotness hotness, int32_t &rc);
+namespace TR
+{
+
+
+class CompilerOptions
+   {
+
+public:
+
+    TR_ALLOC(TR_Memory::CompilerOptions)
+
+
+    #include "control/Options.inc"
+
+
+}; /* Class CompilerOptions */
+
+} /* namespace TR */
+
+#endif  /* OMR_COMPILER_OPTIONS_HPP */
