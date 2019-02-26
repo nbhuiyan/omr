@@ -616,8 +616,9 @@ OMR::CodeGenerator::insertDebugCounters()
          {
          block = node->getBlock();
          self()->setCurrentBlock(block);
-
-         if (self()->comp()->getOption(TR_EnableCFGEdgeCounters))
+   
+         COMPARE_COMP_OPTIONS(self()->comp(),TR_EnableCFGEdgeCounters)
+         if (GET_COMP_OPTION(self()->comp(),TR_EnableCFGEdgeCounters))
             self()->addCountersToEdges(block);
 
          if (block->isCold())

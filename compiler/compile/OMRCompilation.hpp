@@ -36,6 +36,10 @@ namespace OMR { typedef OMR::Compilation CompilationConnector; }
  * \brief Header for OMR::Compilation, root of the Compilation extensible class hierarchy.
  */
 
+// these 2 macros will be defined through -D (or perhaps elsewhere) and NOT here!
+#define NEW_OPTIONS
+
+#define NEW_OPTIONS_DEBUG
 
 #include <stdarg.h>
 #include <stddef.h>
@@ -70,6 +74,9 @@ namespace OMR { typedef OMR::Compilation CompilationConnector; }
 
 #include "il/symbol/ResolvedMethodSymbol.hpp"
 
+#if defined(NEW_OPTIONS) || defined(NEW_OPTIONS_DEBUG)
+#include "control/CompilerOptionsManager.hpp"
+#endif
 
 class TR_AOTGuardSite;
 class TR_BitVector;
@@ -323,10 +330,29 @@ public:
    TR_PersistentMemory *trPersistentMemory() { return _trMemory->trPersistentMemory(); }
 
    bool getOption(TR_CompilationOptions o) {return _options->getOption(o);}
+#if defined(NEW_OPTIONS) || defined(NEW_OPTIONS_DEBUG)
+   TR::CompilerOptions * getNewOptions() {return _compOptions;}
+#endif
    void setOption(TR_CompilationOptions o) { _options->setOption(o); }
 
    bool trace(OMR::Optimizations o)             { return _options->trace(o); }
    bool isDisabled(OMR::Optimizations o)        { return _options->isDisabled(o); }
+
+#if defined(NEW_OPTIONS_DEBUG)
+#define COMPARE_COMP_OPTIONS(x,o) \
+      TR_ASSERT(x->getOption(o) == x->getNewOptions()->o, \
+      "failed equality check between old and new options for the following: " #o);
+#else
+#define COMPARE_COMP_OPTIONS(x,o)
+#endif
+
+#if defined(NEW_OPTIONS)
+#define GET_COMP_OPTION(x,o) \
+   x->getNewOptions()->o
+#else
+#define GET_COMP_OPTION(x,o) \
+   x->getOption(o)
+#endif
 
 
    // Table of heap objects whose identity is known at compile-time
@@ -1034,6 +1060,10 @@ protected:
 
    const char * _signature;
    TR::Options *_options;
+   
+#if defined(NEW_OPTIONS) || defined (NEW_OPTIONS_DEBUG)
+   TR::CompilerOptions *_compOptions;
+#endif
    flags32_t _flags;
    TR::Region & _heapMemoryRegion;
    TR_Memory * _trMemory;

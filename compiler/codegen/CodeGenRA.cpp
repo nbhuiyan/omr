@@ -458,7 +458,9 @@ OMR::CodeGenerator::allocateSpill(int32_t dataSize, bool containsCollectedRefere
    if (self()->getTraceRAOption(TR_TraceRASpillTemps))
       traceMsg(self()->comp(), "\nallocateSpill(%d, %s, %s)", dataSize, containsCollectedReference? "collected":"uncollected", offset? "offset":"NULL");
 
-   if (offset && self()->comp()->getOption(TR_DisableHalfSlotSpills))
+   COMPARE_COMP_OPTIONS(self()->comp(),TR_DisableHalfSlotSpills)
+
+   if (offset && GET_COMP_OPTION(self()->comp(),TR_DisableHalfSlotSpills))
       {
       // Pretend the caller can't handle half-slot spills
       *offset = 0;
@@ -1168,7 +1170,10 @@ OMR::CodeGenerator::pickRegister(TR_RegisterCandidate     *rc,
       isInitialized = true;
       }
 
-   if (self()->comp()->getOption(TR_AssignEveryGlobalRegister))
+
+   COMPARE_COMP_OPTIONS(self()->comp(),TR_AssignEveryGlobalRegister)
+
+   if (GET_COMP_OPTION(self()->comp(),TR_AssignEveryGlobalRegister))
       {
       // Trivial fixed-sequence algorithm
 
@@ -1192,7 +1197,9 @@ OMR::CodeGenerator::pickRegister(TR_RegisterCandidate     *rc,
       TR_ASSERT(0, "Shouldn't get here");
       }
 
-   if (!self()->comp()->getOption(TR_DisableRegisterPressureSimulation))
+   COMPARE_COMP_OPTIONS(self()->comp(),TR_DisableRegisterPressureSimulation)
+
+   if (!GET_COMP_OPTION(self()->comp(),TR_DisableRegisterPressureSimulation))
       {
       // Register pressure simulation algorithm
 
@@ -2353,7 +2360,8 @@ keepMostRecentValueAliveIfLiveOnEntryToSuccessor(
       {
       TR::Node *mrv = candidate->getMostRecentValue();
       cg->simulatedNodeState(mrv, state)._keepLiveUntil = exitPoint;
-      if (comp->getOption(TR_TraceRegisterPressureDetails))
+      COMPARE_COMP_OPTIONS(comp,TR_TraceRegisterPressureDetails)
+      if (GET_COMP_OPTION(comp,TR_TraceRegisterPressureDetails))
          {
          traceMsg(comp, "\n               Will keep #%s live until %s",
             cg->getDebug()->getName(mrv),
@@ -2376,7 +2384,8 @@ killMostRecentValueIfKeptAliveUntilCurrentTreeTop(
       if (nodeState._keepLiveUntil == state->_currentTreeTop)
          {
          nodeState._keepLiveUntil = NULL;
-         if (comp->getOption(TR_TraceRegisterPressureDetails))
+         COMPARE_COMP_OPTIONS(comp,TR_TraceRegisterPressureDetails)
+         if (GET_COMP_OPTION(comp,TR_TraceRegisterPressureDetails))
             traceMsg(comp, " exiting(%s)", cg->getDebug()->getName(mrv));
          if (mrv->getFutureUseCount() == 0)
             {
@@ -2748,8 +2757,8 @@ OMR::CodeGenerator::simulateTreeEvaluation(TR::Node *node, TR_RegisterPressureSt
             TR::Node *child = node->getChild(i);
             self()->simulateNodeInitialization(child, state);
             child->incFutureUseCount();
-
-            if (self()->comp()->getOption(TR_TraceRegisterPressureDetails))
+            COMPARE_COMP_OPTIONS(self()->comp(),TR_TraceRegisterPressureDetails)
+            if (GET_COMP_OPTION(self()->comp(),TR_TraceRegisterPressureDetails))
                traceMsg(self()->comp(), " ++%s", self()->getDebug()->getName(child));
             }
 
@@ -2817,8 +2826,9 @@ OMR::CodeGenerator::simulateTreeEvaluation(TR::Node *node, TR_RegisterPressureSt
          if (isCall)
             {
             self()->getNumberOfTemporaryRegistersUsedByCall(node, state, numGPRTemporaries, numFPRTemporaries, numVRFTemporaries);
+            COMPARE_COMP_OPTIONS(self()->comp(),TR_TraceRegisterPressureDetails)
             if ((numGPRTemporaries >= 1 || numFPRTemporaries >= 1 || numVRFTemporaries >= 1)
-               && (self()->comp()->getOption(TR_TraceRegisterPressureDetails) && !performTransformation(self()->comp(), "O^O GLOBAL REGISTER ALLOCATION: Call %p has %d GPR and %d FPR and VRF %d dummy registers\n", node, numGPRTemporaries, numFPRTemporaries, numVRFTemporaries)))
+               && (GET_COMP_OPTION(self()->comp(),TR_TraceRegisterPressureDetails)) && !performTransformation(self()->comp(), "O^O GLOBAL REGISTER ALLOCATION: Call %p has %d GPR and %d FPR and VRF %d dummy registers\n", node, numGPRTemporaries, numFPRTemporaries, numVRFTemporaries))
                {
                numGPRTemporaries = 0;
                numFPRTemporaries = 0;
@@ -3006,7 +3016,8 @@ OMR::CodeGenerator::simulateNodeEvaluation(TR::Node *node, TR_RegisterPressureSt
    if (evaluateSecondChildFirst)
       {
       TR_ASSERT(node->getNumChildren() == 2, "assertion failure");
-      if (self()->comp()->getOption(TR_TraceRegisterPressureDetails))
+      COMPARE_COMP_OPTIONS(self()->comp(), TR_TraceRegisterPressureDetails)
+      if (GET_COMP_OPTION(self()->comp(),TR_TraceRegisterPressureDetails))
          traceMsg(self()->comp(), " (%s before %s)", self()->getDebug()->getName(node->getSecondChild()), self()->getDebug()->getName(node->getFirstChild()));
       self()->simulateTreeEvaluation(node->getSecondChild(), state, summary);
       self()->simulateTreeEvaluation(node->getFirstChild(),  state, summary);
@@ -3026,7 +3037,8 @@ OMR::CodeGenerator::simulateNodeEvaluation(TR::Node *node, TR_RegisterPressureSt
                && --numArgumentRegisters[callNodeLinkage->argumentRegisterKind(node->getChild(childIndex))] >= 0)
                {
                childrenInRegisters.set(1 << childIndex);
-               if (callNodeLinkage && self()->comp()->getOption(TR_TraceRegisterPressureDetails))
+               COMPARE_COMP_OPTIONS(self()->comp(),TR_TraceRegisterPressureDetails)
+               if (callNodeLinkage && GET_COMP_OPTION(self()->comp(),TR_TraceRegisterPressureDetails))
                   traceMsg(self()->comp(), " (%s arg %d in %s, %d left)",
                      self()->getDebug()->getName(node),
                      childIndex,
@@ -3037,7 +3049,8 @@ OMR::CodeGenerator::simulateNodeEvaluation(TR::Node *node, TR_RegisterPressureSt
                {
                // Child is in memory, so its register dies immediately after the store
                self()->simulateDecReferenceCount(node->getChild(childIndex), state);
-               if (callNodeLinkage && self()->comp()->getOption(TR_TraceRegisterPressureDetails))
+               COMPARE_COMP_OPTIONS(self()->comp(),TR_TraceRegisterPressureDetails)
+               if (callNodeLinkage && GET_COMP_OPTION(self()->comp(),TR_TraceRegisterPressureDetails))
                   traceMsg(self()->comp(), " (%s arg %s in mem)",
                      self()->getDebug()->getName(node),
                      self()->getDebug()->getName(node->getChild(childIndex)));
@@ -3048,8 +3061,8 @@ OMR::CodeGenerator::simulateNodeEvaluation(TR::Node *node, TR_RegisterPressureSt
       if (hasMemRef) // Codegen usually evaluates address child last
          self()->simulateMemoryReference(&memref, node->getChild(0), state, summary);
       }
-
-   if (self()->comp()->getOption(TR_TraceRegisterPressureDetails))
+   COMPARE_COMP_OPTIONS(self()->comp(),TR_TraceRegisterPressureDetails)
+   if (GET_COMP_OPTION(self()->comp(),TR_TraceRegisterPressureDetails))
       {
       traceMsg(self()->comp(), "state->_gprPressure = %d summary->_gprPressure = %d summary->PRESSURE_LIMIT = %d\n",state->_gprPressure,summary->_gprPressure,summary->PRESSURE_LIMIT);
       }
@@ -3086,7 +3099,8 @@ OMR::CodeGenerator::simulateNodeEvaluation(TR::Node *node, TR_RegisterPressureSt
          if (node->getNumChildren() >= 1)
             tag = " decRegArgs";
 
-         if (self()->comp()->getOption(TR_TraceRegisterPressureDetails))
+         COMPARE_COMP_OPTIONS(self()->comp(),TR_TraceRegisterPressureDetails)
+         if (GET_COMP_OPTION(self()->comp(),TR_TraceRegisterPressureDetails))
             traceMsg(self()->comp(), " childrenInRegisters=" UINT64_PRINTF_FORMAT_HEX, childrenInRegisters.getValue());
 
          for (int32_t childIndex = std::min<int32_t>(maxChildrenInRegisters, node->getNumChildren())-1; childIndex >= 0; childIndex--)
@@ -3113,8 +3127,8 @@ OMR::CodeGenerator::simulateNodeEvaluation(TR::Node *node, TR_RegisterPressureSt
    // node's result.
    //
    self()->simulateNodeGoingLive(node, state);
-
-   if (tag && self()->comp()->getOption(TR_TraceRegisterPressureDetails))
+   COMPARE_COMP_OPTIONS(self()->comp(),TR_TraceRegisterPressureDetails)
+   if (tag && GET_COMP_OPTION(self()->comp(),TR_TraceRegisterPressureDetails))
       traceMsg(self()->comp(), tag);
 
    }

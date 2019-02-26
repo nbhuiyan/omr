@@ -424,11 +424,13 @@ OMR::CodeGenerator::addToAtlas(TR::Instruction * instr)
    {
    TR::Compilation *comp = self()->comp();
    TR_GCStackMap * map = 0;
+
+   COMPARE_COMP_OPTIONS(comp,TR_GenerateCompleteInlineRanges)
    if (instr->needsGCMap())
       {
       map = instr->getGCMap();
       }
-   else if (comp->getOption(TR_GenerateCompleteInlineRanges) &&
+   else if (GET_COMP_OPTION(comp,TR_GenerateCompleteInlineRanges) &&
             instr->getNode() && instr->getPrev() && instr->getPrev()->getNode() &&
             instr->getBinaryLength() > 0 &&
             (instr->getNode()->getByteCodeInfo().getCallerIndex() != instr->getPrev()->getNode()->getByteCodeInfo().getCallerIndex() ||
@@ -462,7 +464,9 @@ TR_GCStackMap::addToAtlas(TR::Instruction * instruction, TR::CodeGenerator *code
    uint8_t * codeStart = codeGen->getCodeStart();
    setLowestCodeOffset(instruction->getBinaryEncoding() - codeStart);
    codeGen->getStackAtlas()->addStackMap(this);
-   bool osrEnabled = codeGen->comp()->getOption(TR_EnableOSR);
+
+   COMPARE_COMP_OPTIONS(codeGen->comp(), TR_EnableOSR)
+   bool osrEnabled =  GET_COMP_OPTION(codeGen->comp(), TR_EnableOSR);
    if (osrEnabled)
       codeGen->addToOSRTable(instruction);
    }
@@ -475,7 +479,8 @@ TR_GCStackMap::addToAtlas(uint8_t * callSiteAddress, TR::CodeGenerator *codeGen)
    uint32_t callSiteOffset = callSiteAddress - codeGen->getCodeStart();
    setLowestCodeOffset(callSiteOffset - 1);
    codeGen->getStackAtlas()->addStackMap(this);
-   bool osrEnabled = codeGen->comp()->getOption(TR_EnableOSR);
+   COMPARE_COMP_OPTIONS(codeGen->comp(), TR_EnableOSR)
+   bool osrEnabled =  GET_COMP_OPTION(codeGen->comp(), TR_EnableOSR);
    if (osrEnabled)
       codeGen->addToOSRTable(callSiteOffset, getByteCodeInfo());
    }

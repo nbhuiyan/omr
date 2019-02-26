@@ -295,6 +295,14 @@ OMR::Compilation::Compilation(
    _bitVectorPool(self()),
    _tlsManager(*self())
    {
+   #if defined(NEW_OPTIONS) || defined (NEW_OPTIONS_DEBUG)
+      _compOptions = TR::CompilerOptionsManager::getOptions(); /**
+                                                                * temporary location for setting the options from OptionManager.
+                                                                * once optionset support is fully integrated, getOptions() will take
+                                                                * args that will allow option manager to return the options applicable
+                                                                * to the method being compiled
+                                                                */
+   #endif
 
    //Avoid expensive initialization and uneeded option checking if we are doing AOT Loads
    if (_optimizationPlan && _optimizationPlan->getIsAotLoad())
