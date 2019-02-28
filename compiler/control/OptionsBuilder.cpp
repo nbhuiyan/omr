@@ -25,7 +25,7 @@ void TR::OptionsBuilder::processOptionsString(CompilerOptions * options, char * 
     
     char* startOption = optionString;
     char* endOption = optionString;
-    char currentOptionBuffer[100];
+    char currentOptionBuffer[100]; //todo: this is just temporary since this is obviously not safe for long options (eg, options with regex args)
 
     while (1){
         if (*endOption != '\0'){
@@ -79,11 +79,11 @@ void TR::OptionsBuilder::processOption(CompilerOptions * options, char * optionS
     // Todo: once all option processing is supported, change the following to an assert
     if (OMR::CompilerOptionsManager::_optionTable.end() ==
         OMR::CompilerOptionsManager::_optionTable.find(optionString)){
-            printf("Option %s not in option table entries! Not processed.\n",optionString);
+            fprintf(stderr,"Option %s not in option table entries! Not processed.\n",optionString);
         }
     else{
-        struct TR::OptionTableItem * optItem = &OMR::CompilerOptionsManager::_optionTable[optionString];
-        optItem->fcn(optionString, (void*) options, optItem);
+        TR::OptionTableItem * optItem = &OMR::CompilerOptionsManager::_optionTable[optionString];
+        optItem->fcn(optionString, options, optItem);
     }    
 
     return;

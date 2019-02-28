@@ -19,11 +19,31 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef OMR_NEW_OPTIONS_INC
-#define OMR_NEW_OPTIONS_INC
+#ifndef OMR_COMPILER_OPTIONS_HPP
+#define OMR_COMPILER_OPTIONS_HPP
+
+#ifndef OMR_COMPILER_OPTIONS_CONNECTOR
+#define OMR_COMPILER_OPTIONS_CONNECTOR
+namespace OMR { class CompilerOptions; }
+namespace OMR { typedef OMR::CompilerOptions CompilerOptionsConnector;}
+#endif
+
+#include "env/TRMemory.hpp"
+#include "infra/Annotations.hpp"
+
+namespace OMR
+{
+
+
+class OMR_EXTENSIBLE CompilerOptions
+   {
+
+public:
+
+    TR_ALLOC(TR_Memory::CompilerOptions)
+
 
 bool TR_TestOption1 = false;
-//bool TR_TestOption2 = false;
 bool TR_AOTCompileOnlyFromBootstrap = false;
 bool TR_AOT                        = false;
 bool TR_ReportMethodEnter          = false;
@@ -664,4 +684,9 @@ bool TR_TraceRegisterITFBasic             = false; // = TR_TraceGRABasic;
 bool TR_TraceRegisterITFBuild             = false; 
 bool TR_TraceRegisterITFColour            = false;
 
-#endif /* OMR_NEW_OPTIONS_INC */
+
+}; /* Class CompilerOptions */
+
+} /* namespace TR */
+
+#endif  /* OMR_COMPILER_OPTIONS_HPP */

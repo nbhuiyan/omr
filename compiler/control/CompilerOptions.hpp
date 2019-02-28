@@ -19,28 +19,26 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#ifndef OMR_COMPILER_OPTIONS_HPP
-#define OMR_COMPILER_OPTIONS_HPP
+#ifndef TR_COMPILER_OPTIONS_INCL
+#define TR_COMPILER_OPTIONS_INCL
 
-#include "env/TRMemory.hpp"
+#include "control/OMRCompilerOptions.hpp"
 
 namespace TR
 {
 
 
-class CompilerOptions
+class OMR_EXTENSIBLE CompilerOptions : public OMR::CompilerOptionsConnector
    {
 
 public:
 
-    TR_ALLOC(TR_Memory::CompilerOptions)
+    CompilerOptions() : OMR::CompilerOptionsConnector() {}
 
-
-    #include "control/Options.inc"
-
-
-}; /* Class CompilerOptions */
+    bool TR_LastOption = false; //for demonstration only. not required.
+    
+}; /* class CompilerOptions */
 
 } /* namespace TR */
 
-#endif  /* OMR_COMPILER_OPTIONS_HPP */
+#endif  /* TR_COMPILER_OPTIONS_INCL */

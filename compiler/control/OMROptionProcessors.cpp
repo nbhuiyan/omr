@@ -22,10 +22,10 @@
 #include "control/OMROptionProcessors.hpp"
 
 
-void OMR::OptionProcessors::setTrue(char * optionStr, void * base, TR::OptionTableItem * entry){
-    *((bool *)((char*)base+entry->param1)) = true;
+void OMR::OptionProcessors::setTrue(char * optionStr, TR::CompilerOptions * options, TR::OptionTableItem * entry){
+    options->*(entry->memberToSet.booleanMember) = true;
 }
 
-void OMR::OptionProcessors::setFalse(char * optionStr, void * base, TR::OptionTableItem * entry){
-    *((bool *)((char*)base+entry->param1)) = false;
+void OMR::OptionProcessors::setFalse(char * optionStr, TR::CompilerOptions * options, TR::OptionTableItem * entry){
+    options->*(entry->memberToSet.booleanMember) = false;
 }

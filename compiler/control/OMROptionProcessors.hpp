@@ -37,9 +37,9 @@ class OMR_EXTENSIBLE OptionProcessors{
     
     public:
 
-    static void setTrue(char * optionStr, void * base, TR::OptionTableItem * entry);
+    static void setTrue(char * optionStr, TR::CompilerOptions * options, TR::OptionTableItem * entry);
 
-    static void setFalse(char * optionStr, void * base, TR::OptionTableItem * entry);
+    static void setFalse(char * optionStr, TR::CompilerOptions * options, TR::OptionTableItem * entry);
 }; /** class OptionProcessors */
 
 } //namespace OMR

@@ -35,6 +35,7 @@
 #include "runtime/CodeCache.hpp"
 #include "runtime/Runtime.hpp"
 #include "runtime/JBJitConfig.hpp"
+#include "control/CompilerOptionsManager.hpp"
 
 #if defined(TR_TARGET_S390)
 #include "z/codegen/TRSystemLinkage.hpp"
@@ -102,9 +103,11 @@ initializeCodeCache(TR::CodeCacheManager & codeCacheManager)
    codeCacheConfig._largeCodePageFlags = 0;
    codeCacheConfig._maxNumberOfCodeCaches = 96;
    codeCacheConfig._canChangeNumCodeCaches = true;
-   codeCacheConfig._emitExecutableELF = TR::Options::getCmdLineOptions()->getOption(TR_PerfTool) 
-                                    ||  TR::Options::getCmdLineOptions()->getOption(TR_EmitExecutableELFFile);
-   codeCacheConfig._emitRelocatableELF = TR::Options::getCmdLineOptions()->getOption(TR_EmitRelocatableELFFile);
+   //codeCacheConfig._emitExecutableELF = TR::Options::getCmdLineOptions()->getOption(TR_PerfTool) 
+   //                                 ||  TR::Options::getCmdLineOptions()->getOption(TR_EmitExecutableELFFile);
+   //codeCacheConfig._emitRelocatableELF = TR::Options::getCmdLineOptions()->getOption(TR_EmitRelocatableELFFile);
+   codeCacheConfig._emitExecutableELF = TR::CompilerOptionsManager::getOptions()->TR_EmitExecutableELFFile || TR::CompilerOptionsManager::getOptions()->TR_PerfTool;
+   codeCacheConfig._emitRelocatableELF = TR::CompilerOptionsManager::getOptions()->TR_EmitRelocatableELFFile;
 
    TR::CodeCache *firstCodeCache = codeCacheManager.initialize(true, 1);
    }

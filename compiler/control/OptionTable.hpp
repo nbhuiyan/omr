@@ -33,7 +33,7 @@
  * used as lvalue when an option is being set
  * @param[in] x the option member name
  */
-#define OPTION_MEMBER_TO_SET(x) offsetof(TR::CompilerOptions, x)
+#define OPTION_MEMBER_TO_SET(x) {&TR::CompilerOptions::x}
 
 
 namespace TR{
@@ -115,7 +115,7 @@ struct OptionTableItem;
 /**
  * Option processing function pointer format, used as one of the members in struct OptionTableItem
  */
-typedef void (* OptionProcessingFnPtr)(char * optionStr, void * base, struct OptionTableItem * entry);
+typedef void (* OptionProcessingFnPtr)(char * optionStr, TR::CompilerOptions * options, OptionTableItem * entry);
 
 /**
  * Option hash table using const char* as key, struct OptionTableItem as mapped value, and custom hasher
@@ -123,6 +123,11 @@ typedef void (* OptionProcessingFnPtr)(char * optionStr, void * base, struct Opt
  */
 typedef std::unordered_map<const char *, struct OptionTableItem, OptionMapHasher, OptionKeyEquals> OptionHashTable;
 
+union OptionMemberToSet{
+    bool TR::CompilerOptions::* booleanMember;
+    size_t TR::CompilerOptions::* numericMember;
+    //other member types...
+};
 
 /**
  * struct OptionTableItem contains information on how to handle options that may appear in the command line and/or env
@@ -159,7 +164,7 @@ struct OptionTableItem {
     /**
      * Arg 1 used by the processing function, usually the option member to set
      */
-    intptrj_t param1;
+    OptionMemberToSet memberToSet;
 
     /**
      * Arg 2 used by the processing function, usually the value (numeric, etc) to

@@ -341,6 +341,7 @@ public:
       OptionSet,
       CompilerOptions,
       CompilerOptionsManager,
+      NewOptionSet,
       OrderedExceptionHandlerIterator,
       PCMapEntry,
       PersistentCHTable,
