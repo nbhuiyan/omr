@@ -35,8 +35,14 @@ public:
 
     TR_ALLOC(TR_Memory::CompilerOptions)
 
+    CompilerOptions() :
+    #include "control/OptionInitializerList.inc"
+        optionsProcessed(false)
+        {}
+
 
     #include "control/Options.inc"
+    bool optionsProcessed;
 
 
 }; /* Class CompilerOptions */

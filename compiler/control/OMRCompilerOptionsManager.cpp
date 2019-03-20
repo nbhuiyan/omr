@@ -51,7 +51,6 @@ OMR::CompilerOptionsManager::initialize(char * cmdLineOptions){
     _optionsManager = new (PERSISTENT_NEW) OMR::CompilerOptionsManager();
     _options = new (PERSISTENT_NEW) TR::CompilerOptions();
 
-    //OMR::OptionsBuilder::assignDefaultOptions(_options); //todo
     _optionsManager->setDefaults();
 
     TR::OptionsBuilder::processCmdLineOptions(_options,cmdLineOptions);
@@ -59,6 +58,8 @@ OMR::CompilerOptionsManager::initialize(char * cmdLineOptions){
     TR::OptionsBuilder::processEnvOptions(_options);
 
     _optionsManager->postProcess();
+
+    _options->optionsProcessed = true;
 
     return;
 }

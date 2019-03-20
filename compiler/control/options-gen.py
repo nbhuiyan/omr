@@ -203,7 +203,7 @@ class OptionsGenerator:
         writer.write("#define OPTION_TABLE_SIZE " + str((self.option_table.get_total_entries() * 2)) + "\n")
         writer.write("#define OPTION_TABLE_HASH_RANGE " + str(self.option_table.get_hash_range()) + "\n")
 
-    def write_table_entries_and_data_members(self, table_writer, member_writer):
+    def write_table_entries_and_data_members(self, table_writer, member_writer, initializer_writer):
         self.option_members_written = [] # often multiple options can affect the same member, and
                                          # this is used to prevent duplication
 
@@ -218,9 +218,9 @@ class OptionsGenerator:
                 hash_indices = self.option_table.get_hash_indices(hash_value)
                 if len(hash_indices) == 1:
                     self._write_non_colliding_entry(table_writer, self.option_table.get_entry_by_hash_value(hash_value))
-                    self._write_option_data_member(member_writer, self.option_table.get_entry_by_hash_value(hash_value))
+                    self._write_option_data_member(member_writer, initializer_writer, self.option_table.get_entry_by_hash_value(hash_value))
                 else:
-                    self._write_colliding_entries_and_members(table_writer, member_writer, hash_indices)
+                    self._write_colliding_entries_and_members(table_writer, member_writer, initializer_writer, hash_indices)
             else:
                 self._write_non_colliding_entry(table_writer, None)
             hash_value += 1
@@ -259,10 +259,11 @@ class OptionsGenerator:
 """
         writer.write(header_text.format(datetime.datetime.now().year))
     
-    def _write_option_data_member(self, writer, entry):
+    def _write_option_data_member(self, member_writer, initializer_writer, entry):
         option_member = entry["option-member"]
         if not ( option_member in self.option_members_written ): # currently writes boolean members only
-            writer.write(entry["type"] + " " + entry["option-member"] + " = " + entry["default"] + ";\n")
+            member_writer.write(entry["type"] + " " + entry["option-member"] + ";\n")
+            initializer_writer.write(entry["option-member"] + "(" + entry["default"] + "),\n")
             self.option_members_written.append(option_member)
 
     def _write_option_table_entry(self, writer, entry):
@@ -286,13 +287,13 @@ class OptionsGenerator:
 
         writer.write("},\n")
 
-    def _write_colliding_entries_and_members(self, table_writer, member_writer, colliding_indices):
+    def _write_colliding_entries_and_members(self, table_writer, member_writer, initializer_writer, colliding_indices):
         table_writer.write("{")
 
         for index in colliding_indices:
             entry = self.option_table.get_entry_at_index(index)
             self._write_option_table_entry(table_writer, entry)
-            self._write_option_data_member(member_writer, entry)
+            self._write_option_data_member(member_writer, initializer_writer, entry)
             if index != colliding_indices[-1]:
                 table_writer.write(",")
     
@@ -336,5 +337,6 @@ if __name__ == "__main__":
         options_generator.write_hash_table_properties(writer)
     
     with open(os.path.join(cl_args.omroptionsdir,"OptionTableEntries.inc"), "w") as table_writer, \
-        open(os.path.join(cl_args.omroptionsdir,"Options.inc"), "w") as member_writer:
-        options_generator.write_table_entries_and_data_members(table_writer, member_writer)
+        open(os.path.join(cl_args.omroptionsdir,"Options.inc"), "w") as member_writer, \
+            open(os.path.join(cl_args.omroptionsdir, "OptionInitializerList.inc"), "w") as initializer_writer:
+        options_generator.write_table_entries_and_data_members(table_writer, member_writer, initializer_writer)
