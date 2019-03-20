@@ -37,6 +37,7 @@ set(OPTIONS_GENERATOR ${CMAKE_CURRENT_LIST_DIR}/options-gen.py)
 
 set(OPTIONS_GENERATOR_OUTPUT
 	${CMAKE_CURRENT_LIST_DIR}/Options.inc
+	${CMAKE_CURRENT_LIST_DIR}/OptionInitializerList.inc
 	${CMAKE_CURRENT_LIST_DIR}/OptionTableProperties.inc
 	${CMAKE_CURRENT_LIST_DIR}/OptionTableEntries.inc
 	${CMAKE_CURRENT_LIST_DIR}/OptionCharMap.inc
