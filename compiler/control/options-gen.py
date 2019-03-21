@@ -80,6 +80,7 @@ class OptionTable:
 
     def __init__(self, json_entries):
         self._num_table_entries = len(json_entries)
+        self._max_bucket_size = 1
         self._populate_table(json_entries)
 
     def hash_string(self, key):
@@ -127,6 +128,13 @@ class OptionTable:
 
     def get_hashed_string_at_index(self, index):
         return self._hashed_strings[index]
+    
+    def get_max_bucket_size(self):
+        return self._max_bucket_size
+
+    def set_max_bucket_size(self, bucket_size):
+        self._max_bucket_size = bucket_size
+
 
     def _populate_table(self, json_entries):
         for entry in json_entries:
@@ -202,6 +210,7 @@ class OptionsGenerator:
         writer.write("#define OPTION_TABLE_TOTAL_ENTRIES " + str(self.option_table.get_total_entries()) + "\n")
         writer.write("#define OPTION_TABLE_SIZE " + str((self.option_table.get_total_entries() * 2)) + "\n")
         writer.write("#define OPTION_TABLE_HASH_RANGE " + str(self.option_table.get_hash_range()) + "\n")
+        writer.write("#define OPTION_TABLE_MAX_BUCKET_SIZE " + str(self.option_table.get_max_bucket_size()) + "\n")
 
     def write_table_entries_and_data_members(self, table_writer, member_writer, initializer_writer):
         self.option_members_written = [] # often multiple options can affect the same member, and
@@ -288,6 +297,9 @@ class OptionsGenerator:
         writer.write("},\n")
 
     def _write_colliding_entries_and_members(self, table_writer, member_writer, initializer_writer, colliding_indices):
+        if self.option_table.get_max_bucket_size() < len(colliding_indices):
+            self.option_table.set_max_bucket_size(len(colliding_indices))
+
         table_writer.write("{")
 
         for index in colliding_indices:
@@ -332,11 +344,10 @@ if __name__ == "__main__":
     options_generator = OptionsGenerator(option_table)
     with open(os.path.join(cl_args.omroptionsdir,"OptionCharMap.inc"), "w") as writer:
         options_generator.write_char_values(writer)
-
-    with open(os.path.join(cl_args.omroptionsdir,"OptionTableProperties.inc"), "w") as writer:
-        options_generator.write_hash_table_properties(writer)
-    
     with open(os.path.join(cl_args.omroptionsdir,"OptionTableEntries.inc"), "w") as table_writer, \
         open(os.path.join(cl_args.omroptionsdir,"Options.inc"), "w") as member_writer, \
             open(os.path.join(cl_args.omroptionsdir, "OptionInitializerList.inc"), "w") as initializer_writer:
         options_generator.write_table_entries_and_data_members(table_writer, member_writer, initializer_writer)
+    
+    with open(os.path.join(cl_args.omroptionsdir,"OptionTableProperties.inc"), "w") as writer:
+        options_generator.write_hash_table_properties(writer)

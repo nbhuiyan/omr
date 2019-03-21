@@ -45,13 +45,6 @@ struct OptionTableItem;
  */
 typedef void (* OptionProcessingFnPtr)(char * optionStr, void * dataObj, OptionTableItem * entry);
 
-/**
- * Option hash table using const char* as key, struct OptionTableItem as mapped value, and custom hasher
- * and key equal objects meant to enable case-insensitive option lookup and handling of trailing '='
- */
-
-typedef std::vector<OptionTableItem> OptionTableBucket;
-
 union OptionMemberToSet{
     bool TR::CompilerOptions::* booleanMember;
     size_t TR::CompilerOptions::* numericMember; // just an example, not actually used yet

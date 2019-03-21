@@ -32,7 +32,7 @@
 OMR::CompilerOptionsManager * OMR::CompilerOptionsManager::_optionsManager = 0;
 TR::CompilerOptions * OMR::CompilerOptionsManager::_options = 0;
 
-const TR::OptionTableBucket OMR::CompilerOptionsManager::_optionTable[] = {
+TR::OptionTableItem OMR::CompilerOptionsManager::_optionTable[][OPTION_TABLE_MAX_BUCKET_SIZE] = {
 
 #include "control/OptionTableEntries.inc"
 
@@ -74,14 +74,15 @@ OMR::CompilerOptionsManager::getOptionTableEntry(char * optionName, int length){
       hash = ((hash * 7) + _hashingValues[c]) % OPTION_TABLE_SIZE;
    }
 
-   TR::OptionTableBucket bucket = _optionTable[hash];
-
-   if (bucket.empty()){
+   if (0 == _optionTable[hash][0].optionName){
       return NULL;
    } else {
       char * entryNamePtr;
-      for (int i = 0; i < bucket.size(); i++){
-         entryNamePtr = bucket[i].optionName;
+      for (int i = 0; i < OPTION_TABLE_MAX_BUCKET_SIZE; i++){
+         entryNamePtr = _optionTable[hash][i].optionName;
+         if (0 == entryNamePtr){
+            break;
+         }
          optionNamePtr = optionName;
          if (length == strlen(entryNamePtr)){
             char c1, c2;
@@ -90,7 +91,7 @@ OMR::CompilerOptionsManager::getOptionTableEntry(char * optionName, int length){
                diff = _hashingValues[c1] - _hashingValues[c2];
                if (diff != 0) break;
             }
-            if (diff == 0) return &bucket[i];
+            if (diff == 0) return &_optionTable[hash][i];
          }
       }
       return NULL;
