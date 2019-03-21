@@ -44,7 +44,7 @@ class OMR_EXTENSIBLE CompilerOptionsManager{
 public:
     TR_ALLOC(TR_Memory::CompilerOptionsManager)
 
-    static const TR::OptionTableBucket _optionTable[];
+    static TR::OptionTableItem _optionTable[][OPTION_TABLE_MAX_BUCKET_SIZE];
     static const unsigned char _hashingValues[];
     static TR::CompilerOptions         *_options;
     static OMR::CompilerOptionsManager  *_optionsManager;
