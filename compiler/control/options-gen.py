@@ -320,34 +320,41 @@ if __name__ == "__main__":
     cl_parser.add_argument("-omroptionsdir",type=str,
                         default=os.getcwd(),
                         help="Path to JSON file containing OMR compiler options")
-    cl_parser.add_argument("-options",type=str,
+    cl_parser.add_argument("-projoptions",type=str,
                         default="",
                         help="JSON file containing project-specific options")
     cl_parser.add_argument("-optionsdir",type=str,
                         default="",
                         help="Path to JSON file containing project-specific options")
+    cl_parser.add_argument("-outputdir", type=str,
+                            default="",
+                            help="Path to output generated files to")
     cl_parser.add_argument("-platform",type=str,
                         default="",
                         help="Set this option to exclude/include platform-specific options") #todo
                         
-
     cl_args = cl_parser.parse_args()
+
+    if len(cl_args.outputdir) != 0:
+        output_dir = cl_args.outputdir
+    else:
+        output_dir = cl_args.omroptionsdir
 
     with open(os.path.join(cl_args.omroptionsdir,cl_args.omroptions), "r") as omr_ot:
         json_entries = json.load(omr_ot)
 
-    if len(cl_args.options) != 0:
-        with open(os.path.join(cl_args.optionsdir,cl_args.options), "r") as proj_ot:
+    if len(cl_args.projoptions) != 0:
+        with open(os.path.join(cl_args.optionsdir,cl_args.projoptions), "r") as proj_ot:
             json_entries = json_entries + json.load(proj_ot)
 
     option_table = OptionTable(json_entries)
     options_generator = OptionsGenerator(option_table)
-    with open(os.path.join(cl_args.omroptionsdir,"OptionCharMap.inc"), "w") as writer:
+    with open(os.path.join(output_dir,"OptionCharMap.inc"), "w") as writer:
         options_generator.write_char_values(writer)
-    with open(os.path.join(cl_args.omroptionsdir,"OptionTableEntries.inc"), "w") as table_writer, \
-        open(os.path.join(cl_args.omroptionsdir,"Options.inc"), "w") as member_writer, \
-            open(os.path.join(cl_args.omroptionsdir, "OptionInitializerList.inc"), "w") as initializer_writer:
+    with open(os.path.join(output_dir,"OptionTableEntries.inc"), "w") as table_writer, \
+        open(os.path.join(output_dir,"Options.inc"), "w") as member_writer, \
+            open(os.path.join(output_dir, "OptionInitializerList.inc"), "w") as initializer_writer:
         options_generator.write_table_entries_and_data_members(table_writer, member_writer, initializer_writer)
     
-    with open(os.path.join(cl_args.omroptionsdir,"OptionTableProperties.inc"), "w") as writer:
+    with open(os.path.join(output_dir,"OptionTableProperties.inc"), "w") as writer:
         options_generator.write_hash_table_properties(writer)

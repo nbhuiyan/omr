@@ -25,32 +25,35 @@ compiler_library(control
 	${CMAKE_CURRENT_LIST_DIR}/OMRRecompilation.cpp
 	${CMAKE_CURRENT_LIST_DIR}/CompilationController.cpp
 	${CMAKE_CURRENT_LIST_DIR}/CompileMethod.cpp
-	${CMAKE_CURRENT_LIST_DIR}/OMROptionProcessors.cpp
-	${CMAKE_CURRENT_LIST_DIR}/OMRCompilerOptionsManager.cpp
-	${CMAKE_CURRENT_LIST_DIR}/OptionsBuilder.cpp
 )
 
-# Temporary WIP solution to run the Options Generator prior to the generated
-# files being needed
+if (OMR_COMPILER_NEW_OPTIONS)
+	compiler_library(control
+		${CMAKE_CURRENT_LIST_DIR}/OMROptionProcessors.cpp
+		${CMAKE_CURRENT_LIST_DIR}/OMRCompilerOptionsManager.cpp
+		${CMAKE_CURRENT_LIST_DIR}/OptionsBuilder.cpp
+	)
 
-set(OPTIONS_GENERATOR ${CMAKE_CURRENT_LIST_DIR}/options-gen.py)
+	set(OPTIONS_GENERATOR ${CMAKE_CURRENT_LIST_DIR}/options-gen.py)
 
-set(OPTIONS_GENERATOR_OUTPUT
-	${CMAKE_CURRENT_LIST_DIR}/Options.inc
-	${CMAKE_CURRENT_LIST_DIR}/OptionInitializerList.inc
-	${CMAKE_CURRENT_LIST_DIR}/OptionTableProperties.inc
-	${CMAKE_CURRENT_LIST_DIR}/OptionTableEntries.inc
-	${CMAKE_CURRENT_LIST_DIR}/OptionCharMap.inc
-)
+	set(OPTIONS_GENERATOR_OUTPUT
+		${CMAKE_BINARY_DIR}/compiler/control/Options.inc
+		${CMAKE_BINARY_DIR}/compiler/control/OptionInitializerList.inc
+		${CMAKE_BINARY_DIR}/compiler/control/OptionTableProperties.inc
+		${CMAKE_BINARY_DIR}/compiler/control/OptionTableEntries.inc
+		${CMAKE_BINARY_DIR}/compiler/control/OptionCharMap.inc
+	)
 
-add_custom_command(
-	OUTPUT ${OPTIONS_GENERATOR_OUTPUT}
-	COMMAND echo "running python options generator"
-	COMMAND ${PYTHON_EXECUTABLE} ${OPTIONS_GENERATOR} -omroptionsdir ${CMAKE_CURRENT_LIST_DIR}
-	DEPENDS ${OPTIONS_GENERATOR}
-)
+	add_custom_command(
+		OUTPUT ${OPTIONS_GENERATOR_OUTPUT}
+		COMMAND echo "running options-gen"
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/compiler/control
+		COMMAND ${PYTHON_EXECUTABLE} ${OPTIONS_GENERATOR} -omroptionsdir ${CMAKE_CURRENT_LIST_DIR} -outputdir ${CMAKE_BINARY_DIR}/compiler/control
+		DEPENDS ${OPTIONS_GENERATOR}
+	)
 
-add_custom_target(
-	generate-options ALL
-	DEPENDS ${OPTIONS_GENERATOR_OUTPUT}
-)
+	add_custom_target(
+		generate-options
+		DEPENDS ${OPTIONS_GENERATOR_OUTPUT}
+	)
+endif()

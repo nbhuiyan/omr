@@ -58,7 +58,10 @@
 #include "env/DebugSegmentProvider.hpp"
 #include "omrformatconsts.h"
 #include "runtime/CodeCacheManager.hpp"
+
+#if defined(NEW_OPTIONS)
 #include "control/CompilerOptionsManager.hpp"
+#endif
 
 #if defined (_MSC_VER) && _MSC_VER < 1900
 #define snprintf _snprintf
@@ -218,7 +221,7 @@ int32_t init_options(TR::JitConfig *jitConfig, char *cmdLineOptions)
 
 int32_t init_new_options(TR::JitConfig *jitConfig, char * cmdLineOptions)
    {
-
+#if defined(NEW_OPTIONS)
    if (cmdLineOptions && (0 == strncmp("-Xjit",cmdLineOptions,5)))
       {
       cmdLineOptions += 5;
@@ -236,7 +239,7 @@ int32_t init_new_options(TR::JitConfig *jitConfig, char * cmdLineOptions)
    else {
       printf ("\nTest Option1 not set\n\n");
    }
-
+#endif
    return 0;
 
    }
