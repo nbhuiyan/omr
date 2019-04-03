@@ -998,15 +998,6 @@
     "processing-fn": "setTrue",
     "subsettable": "no"
 },{
-    "name": "enableRubyTieredCompilation",
-    "category": "O",
-    "desc": "Enable Tiered Compilation on Ruby",
-    "option-member": "TR_EnableRubyTieredCompilation",
-    "type": "bool",
-    "default": "false",
-    "processing-fn": "setTrue",
-    "subsettable": "no"
-},{
     "name": "enableRIEMIT",
     "category": "O",
     "desc": "Allows the z Codegen to emit RIEMIT instructions",
@@ -1151,15 +1142,6 @@
     "processing-fn": "setTrue",
     "subsettable": "no"
 },{
-    "name": "enableMethodTrampolineReservation",
-    "category": "O",
-    "desc": "Reserve method trampolines even if they are not needed; only applicable on x86 and zLinux",
-    "option-member": "TR_EnableMethodTrampolineReservation",
-    "type": "bool",
-    "default": "false",
-    "processing-fn": "setTrue",
-    "subsettable": "no"
-},{
     "name": "enableMetadataReclamation",
     "category": "I",
     "desc": "enable J9JITExceptionTable reclamation",
@@ -1227,15 +1209,6 @@
     "category": "M",
     "desc": "Do not use NoServer during startup",
     "option-member": "TR_DisableNoServerDuringStartup",
-    "type": "bool",
-    "default": "false",
-    "processing-fn": "setTrue",
-    "subsettable": "no"
-},{
-    "name": "enableLongRegAllocation",
-    "category": "O",
-    "desc": "enable allocation of 64-bit regs on 32-bit",
-    "option-member": "TR_Enable64BitRegsOn32Bit",
     "type": "bool",
     "default": "false",
     "processing-fn": "setTrue",
@@ -2087,15 +2060,6 @@
     "processing-fn": "setFalse",
     "subsettable": "no"
 },{
-    "name": "enableLongRegAllocationHeuristic",
-    "category": "O",
-    "desc": "enable heuristic for long register allocation",
-    "option-member": "TR_Enable64BitRegsOn32BitHeuristic",
-    "type": "bool",
-    "default": "false",
-    "processing-fn": "setTrue",
-    "subsettable": "no"
-},{
     "name": "disableTM",
     "category": "O",
     "desc": "disable transactional memory support",
@@ -2915,15 +2879,6 @@
     "processing-fn": "setTrue",
     "subsettable": "no"
 },{
-    "name": "forceLargeRAMoves",
-    "category": "O",
-    "desc": "Always use 64 bit register moves in RA",
-    "option-member": "TR_ForceLargeRAMoves",
-    "type": "bool",
-    "default": "false",
-    "processing-fn": "setTrue",
-    "subsettable": "no"
-},{
     "name": "disableInlineWriteBarriersRT",
     "category": "O",
     "desc": "disable write barrier inline fast helper for real-time",
@@ -3117,15 +3072,6 @@
     "category": "O",
     "desc": "disable verification of internal data structures between passes",
     "option-member": "TR_DisableVerification",
-    "type": "bool",
-    "default": "false",
-    "processing-fn": "setTrue",
-    "subsettable": "no"
-},{
-    "name": "disableLongRegAllocationHeuristic",
-    "category": "O",
-    "desc": "disable heuristic for long register allocation",
-    "option-member": "TR_Disable64BitRegsOn32BitHeuristic",
     "type": "bool",
     "default": "false",
     "processing-fn": "setTrue",
@@ -4436,15 +4382,6 @@
     "processing-fn": "setTrue",
     "subsettable": "no"
 },{
-    "name": "enableRubyCodeCacheReclamation",
-    "category": "O",
-    "desc": "Enable Tiered Compilation on Ruby",
-    "option-member": "TR_EnableRubyCodeCacheReclamation",
-    "type": "bool",
-    "default": "false",
-    "processing-fn": "setTrue",
-    "subsettable": "no"
-},{
     "name": "disableRefArraycopyRT",
     "category": "O",
     "desc": "disable reference arraycopy for real-time gc",
@@ -4710,15 +4647,6 @@
     "category": "I",
     "desc": "disable the freeing of compilations.",
     "option-member": "TR_DisableCodeCacheReclamation",
-    "type": "bool",
-    "default": "false",
-    "processing-fn": "setTrue",
-    "subsettable": "no"
-},{
-    "name": "disableLongRegAllocation",
-    "category": "O",
-    "desc": "disable allocation of 64-bit regs on 32-bit",
-    "option-member": "TR_Disable64BitRegsOn32Bit",
     "type": "bool",
     "default": "false",
     "processing-fn": "setTrue",

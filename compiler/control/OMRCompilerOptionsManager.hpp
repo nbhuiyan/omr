@@ -34,6 +34,7 @@ namespace OMR { typedef OMR::CompilerOptionsManager CompilerOptionsManagerConnec
 #include "control/OptionProcessors.hpp"
 #include "env/TRMemory.hpp"
 #include "infra/Annotations.hpp"
+#include "control/Options.hpp"
 
 #include "control/OptionTableProperties.inc"
 
@@ -59,6 +60,8 @@ public:
     }
 
     static TR::OptionTableItem * getOptionTableEntry(char * optionName, int length);
+
+    static bool TR::CompilerOptions::* getMemberPtrFromOldEnum(TR_CompilationOptions option);
 
 private:
     void setDefaults(); //only for jitbuilder

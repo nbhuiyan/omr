@@ -834,8 +834,8 @@ enum TR_CompilationOptions
    // Available                                       = 0x00000100 + 25,
    TR_TraceTempUsage                                  = 0x00000200 + 25,
    TR_TraceTempUsageMore                              = 0x00000400 + 25,
-   // Available                                       = 0x00000800 + 25,
-   // Available                                       = 0x00001000 + 25,
+   TR_TestOption1                                     = 0x00000800 + 25, // used only in the new option processing framework
+   TR_TestOption2                                     = 0x00001000 + 25, // used only in the new option processing framework
    TR_TracePREForOptimalSubNodeReplacement            = 0x00002000 + 25,
    // Available                                       = 0x00008000 + 25,
    TR_PerfTool                                        = 0x00010000 + 25,
@@ -955,7 +955,7 @@ enum TR_CompilationOptions
    TR_IncreaseCountsForNonBootstrapMethods            = 0x00080000 + 29,
    TR_ReduceCountsForMethodsCompiledDuringStartup     = 0x00100000 + 29,
    TR_IncreaseCountsForMethodsCompiledOutsideStartup  = 0x00200000 + 29,
-   // Available                                       = 0x00400000 + 29,
+   TR_UseRIOnlyForLargeQSZ                            = 0x00400000 + 29,
    TR_UseGlueIfMethodTrampolinesAreNotNeeded          = 0x00800000 + 29,
    TR_EnableFpreductionAnnotation                     = 0x01000000 + 29,
    TR_ExtractExitsByInvalidatingStructure             = 0x02000000 + 29,
@@ -963,7 +963,6 @@ enum TR_CompilationOptions
    TR_InhibitRIBufferProcessingDuringDeepSteady       = 0x08000000 + 29,
    TR_DontDowngradeWhenRIIsTemporarilyOff             = 0x10000000 + 29,
    TR_DontRIUpgradeAOTWarmMethods                     = 0x20000000 + 29,
-   TR_UseRIOnlyForLargeQSZ                            = 0x20000000 + 29,
    TR_EnableAggressiveLiveness                        = 0x40000000 + 29,
    TR_DisableGuardedStaticFinalFieldFolding           = 0x80000000 + 29,
 

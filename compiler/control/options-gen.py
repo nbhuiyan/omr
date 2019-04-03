@@ -236,6 +236,13 @@ class OptionsGenerator:
     
         table_writer.write("{ }")
 
+    # temporary mechanism to enable boolean option querying using the existing API
+    def write_option_translating_switch(self, writer):
+        self._write_file_header(writer)
+
+        for option in self.option_members_written:
+            writer.write("case " + option + ": return &TR::CompilerOptions::"+ option + ";\n" )
+
 
     def _write_file_header(self, writer):
         header_text = \
@@ -358,3 +365,6 @@ if __name__ == "__main__":
     
     with open(os.path.join(output_dir,"OptionTableProperties.inc"), "w") as writer:
         options_generator.write_hash_table_properties(writer)
+
+    with open(os.path.join(output_dir,"OptionTranslatingSwitch.inc"), "w") as writer:
+        options_generator.write_option_translating_switch(writer)

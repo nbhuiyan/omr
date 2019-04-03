@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
-#include "control/Options.hpp"
 
 OMR::CompilerOptionsManager * OMR::CompilerOptionsManager::_optionsManager = 0;
 TR::CompilerOptions * OMR::CompilerOptionsManager::_options = 0;
@@ -96,6 +95,14 @@ OMR::CompilerOptionsManager::getOptionTableEntry(char * optionName, int length){
       }
       return NULL;
    }
+}
+
+bool TR::CompilerOptions::*
+OMR::CompilerOptionsManager::getMemberPtrFromOldEnum(TR_CompilationOptions option){
+   switch(option){
+      #include "control/OptionTranslatingSwitch.inc"
+      default: return &TR::CompilerOptions::unknownBooleanOption;
+   };
 }
 
 void

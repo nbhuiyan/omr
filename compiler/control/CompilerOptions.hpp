@@ -37,11 +37,13 @@ public:
 
     CompilerOptions() :
     #include "control/OptionInitializerList.inc"
+        unknownBooleanOption(false),
         optionsProcessed(false)
         {}
 
 
     #include "control/Options.inc"
+    bool unknownBooleanOption;
     bool optionsProcessed;
 
 
