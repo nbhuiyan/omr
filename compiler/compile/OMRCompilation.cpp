@@ -206,6 +206,14 @@ OMR::Compilation::Compilation(
       TR_OptimizationPlan *optimizationPlan) :
    _signature(compilee->signature(m)),
    _options(&options),
+   #if defined(NEW_OPTIONS)
+   _newOptions(TR::CompilerOptionsManager::getOptions()), /**
+                                                                * temporary location for setting the options from CompilerOptionsManager.
+                                                                * once optionset support is fully integrated, getOptions() will take
+                                                                * args that will allow option manager to return the options applicable
+                                                                * to the compilation
+                                                                */
+   #endif
    _heapMemoryRegion(heapMemoryRegion),
    _trMemory(m),
    _fe(fe),
@@ -295,7 +303,6 @@ OMR::Compilation::Compilation(
    _bitVectorPool(self()),
    _tlsManager(*self())
    {
-
    //Avoid expensive initialization and uneeded option checking if we are doing AOT Loads
    if (_optimizationPlan && _optimizationPlan->getIsAotLoad())
       {
@@ -464,6 +471,40 @@ OMR::Compilation::Compilation(
 OMR::Compilation::~Compilation() throw()
    {
    }
+#if defined(NEW_OPTIONS)
+bool 
+OMR::Compilation::getOption(TR_CompilationOptions o){
+   bool TR::CompilerOptions::* memberPtr = TR::CompilerOptionsManager::getMemberPtrFromOldEnum(o);
+   if (memberPtr == &TR::CompilerOptions::unknownBooleanOption){
+      void* callstack[128];
+      int i, frames = backtrace(callstack,128);
+      char ** strs = backtrace_symbols(callstack, frames);
+      for (i = 0; i < frames; i++){
+         printf("%s\n",strs[i]);
+      }
+   }
+#if defined(NEW_OPTIONS_DEBUG)
+   if (_newOptions->*(memberPtr) != _options->getOption(o)){
+      fprintf(stderr,"Options not equal for: %s\n",TR::CompilerOptionsManager::getOptionNameFromOldEnum(o));
+      void* callstack[128];
+      int i, frames = backtrace(callstack,128);
+      char ** strs = backtrace_symbols(callstack, frames);
+      for (i = 0; i < frames; i++){
+         printf("%s\n",strs[i]);
+      }
+      TR_ASSERT(0 == o, "Failed option comparision");
+   }
+#endif
+   return _newOptions->*(memberPtr);
+}
+
+void
+OMR::Compilation::setOption(TR_CompilationOptions o){
+   bool TR::CompilerOptions::* memberPtr = TR::CompilerOptionsManager::getMemberPtrFromOldEnum(o);
+   _newOptions->*(memberPtr) = true;
+   _options->setOption(o);
+}
+#endif
 
 
 TR::KnownObjectTable *

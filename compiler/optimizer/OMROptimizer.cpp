@@ -1441,7 +1441,7 @@ int32_t OMR::Optimizer::performOptimization(const OptimizationStrategy *optimiza
          break;
 
       case IfFullInliningUnderOSRDebug:
-     if (comp()->getOption(TR_FullSpeedDebug) && comp()->getOption(TR_EnableOSR) && comp()->getOption(TR_FullInlineUnderOSRDebug))
+     if (comp()->getOption(TR_FullSpeedDebug) /** not in options */ && comp()->getOption(TR_EnableOSR) && comp()->getOption(TR_FullInlineUnderOSRDebug))
             doThisOptimization = true;
          break;
 

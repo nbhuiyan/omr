@@ -19,14 +19,15 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#include "control/OMRCompilerOptionsManager.hpp"
-#include "control/OptionsBuilder.hpp"
-#include "codegen/FrontEnd.hpp"
 #include <cstdlib>
 #include <cstring>
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
+#include "control/OMRCompilerOptionsManager.hpp"
+#include "control/OptionsBuilder.hpp"
+#include "codegen/FrontEnd.hpp"
+#include "infra/Assert.hpp"
 
 OMR::CompilerOptionsManager * OMR::CompilerOptionsManager::_optionsManager = 0;
 TR::CompilerOptions * OMR::CompilerOptionsManager::_options = 0;
@@ -102,7 +103,17 @@ OMR::CompilerOptionsManager::getMemberPtrFromOldEnum(TR_CompilationOptions optio
    switch(option){
       #include "control/OptionTranslatingSwitch.inc"
       default: return &TR::CompilerOptions::unknownBooleanOption;
+
+   return &TR::CompilerOptions::unknownBooleanOption;
    };
+}
+
+char * 
+OMR::CompilerOptionsManager::getOptionNameFromOldEnum(TR_CompilationOptions option){
+   switch (option){
+      #include "control/OptionEnumToStringSwitch.inc"
+      default: return "Uknown option";
+   }
 }
 
 void

@@ -242,6 +242,12 @@ class OptionsGenerator:
 
         for option in self.option_members_written:
             writer.write("case " + option + ": return &TR::CompilerOptions::"+ option + ";\n" )
+    
+    def write_option_enum_to_char_translating_switch(self, writer):
+        self._write_file_header(writer)
+
+        for option in self.option_members_written:
+            writer.write("case " + option + ": return \"" + option + "\";\n")
 
 
     def _write_file_header(self, writer):
@@ -368,3 +374,6 @@ if __name__ == "__main__":
 
     with open(os.path.join(output_dir,"OptionTranslatingSwitch.inc"), "w") as writer:
         options_generator.write_option_translating_switch(writer)
+
+    with open(os.path.join(output_dir,"OptionEnumToStringSwitch.inc"), "w") as writer:
+        options_generator.write_option_enum_to_char_translating_switch(writer)

@@ -63,6 +63,8 @@ public:
 
     static bool TR::CompilerOptions::* getMemberPtrFromOldEnum(TR_CompilationOptions option);
 
+    static char * getOptionNameFromOldEnum(TR_CompilationOptions option);
+
 private:
     void setDefaults(); //only for jitbuilder
 
