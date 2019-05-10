@@ -5723,15 +5723,6 @@
     "processing-fn":"setTrue",
     "subsettable":"no"
 },{
-    "name":"DisableNoVMAccess",
-    "category":"M",
-    "desc":"todo",
-    "option-member": "TR_DisableNoVMAccess",
-    "type":"bool",
-    "default":"false",
-    "processing-fn":"setTrue",
-    "subsettable":"no"
-},{
     "name":"HWProfileDeleteEmptyBlocks",
     "category":"M",
     "desc":"todo",

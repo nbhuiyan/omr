@@ -70,11 +70,6 @@ namespace OMR { typedef OMR::Compilation CompilationConnector; }
 
 #include "il/symbol/ResolvedMethodSymbol.hpp"
 
-#if defined(NEW_OPTIONS)
-#include "control/CompilerOptionsManager.hpp"
-#endif
-
-
 class TR_AOTGuardSite;
 class TR_BitVector;
 class TR_CHTable;
@@ -325,13 +320,9 @@ public:
    TR_StackMemory trStackMemory()       { return _trMemory; }
    TR_HeapMemory trHeapMemory()         { return _trMemory; }
    TR_PersistentMemory *trPersistentMemory() { return _trMemory->trPersistentMemory(); }
-#if defined(NEW_OPTIONS)
-   bool getOption(TR_CompilationOptions o);
-   void setOption(TR_CompilationOptions o);
-#else
+
    bool getOption(TR_CompilationOptions o) {return _options->getOption(o);}
    void setOption(TR_CompilationOptions o) { _options->setOption(o); }
-#endif
 
    bool trace(OMR::Optimizations o)             { return _options->trace(o); }
    bool isDisabled(OMR::Optimizations o)        { return _options->isDisabled(o); }
@@ -1043,9 +1034,6 @@ protected:
    const char * _signature;
    TR::Options *_options;
 
-#if defined(NEW_OPTIONS)
-   TR::CompilerOptions *_newOptions;
-#endif
 
    flags32_t _flags;
    TR::Region & _heapMemoryRegion;

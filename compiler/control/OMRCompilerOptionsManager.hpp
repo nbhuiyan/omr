@@ -34,13 +34,18 @@ namespace OMR { typedef OMR::CompilerOptionsManager CompilerOptionsManagerConnec
 #include "control/OptionProcessors.hpp"
 #include "env/TRMemory.hpp"
 #include "infra/Annotations.hpp"
-#include "control/Options.hpp"
 
 #include "control/OptionTableProperties.inc"
+
+namespace TR {class CompilerOptionsManager;}
 
 namespace OMR {
 
 class OMR_EXTENSIBLE CompilerOptionsManager{
+
+protected:
+    TR::CompilerOptionsManager * self();
+    //const TR::CompilerOptionsManager * self() const;
 
 public:
     TR_ALLOC(TR_Memory::CompilerOptionsManager)
@@ -48,7 +53,7 @@ public:
     static TR::OptionTableItem _optionTable[][OPTION_TABLE_MAX_BUCKET_SIZE];
     static const unsigned char _hashingValues[];
     static TR::CompilerOptions         *_options;
-    static OMR::CompilerOptionsManager  *_optionsManager;
+    static TR::CompilerOptionsManager  *_optionsManager;
 
     /**
      * temp
@@ -61,14 +66,14 @@ public:
 
     static TR::OptionTableItem * getOptionTableEntry(char * optionName, int length);
 
-    static bool TR::CompilerOptions::* getMemberPtrFromOldEnum(TR_CompilationOptions option);
+    static bool TR::CompilerOptions::* getMemberPtrFromOldEnum(uint32_t option);
 
-    static char * getOptionNameFromOldEnum(TR_CompilationOptions option);
+    static char * getOptionNameFromOldEnum(uint32_t option);
 
-private:
-    void setDefaults(); //only for jitbuilder
+//private:
+    //void setDefaults(); //only for jitbuilder
 
-    void postProcess(); //
+    //void postProcess(); //
 
 }; /* class CompilerOptionsManager */
 

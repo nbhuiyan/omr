@@ -1599,6 +1599,7 @@ TR_FrontEnd *OMR::Options::_fe     = 0;
 TR::Options *OMR::Options::_cmdLineOptions = 0;
 TR::Options *OMR::Options::_jitCmdLineOptions = 0;
 TR::Options *OMR::Options::_aotCmdLineOptions = 0;
+TR::CompilerOptions * OMR::Options::_newOptions = 0;
 
 bool OMR::Options::_hasLogFile = false;
 bool OMR::Options::_suppressLogFileBecauseDebugObjectNotCreated = false;
@@ -2380,6 +2381,10 @@ OMR::Options::processOptionsJIT(char *jitOptions, void *feBase, TR_FrontEnd *fe)
    // Create the default JIT command line options object
    // only do this if this the first time around we're processing options
    //
+#if defined(NEW_OPTIONS)
+      TR::CompilerOptionsManager::initialize(jitOptions);
+      _newOptions = TR::CompilerOptionsManager::getOptions();
+#endif
    if (!_jitCmdLineOptions)
       {
       _jitCmdLineOptions = new (PERSISTENT_NEW) TR::Options();
@@ -2421,6 +2426,11 @@ OMR::Options::processOptionsJIT(char *jitOptions, void *feBase, TR_FrontEnd *fe)
 char *
 OMR::Options::processOptionsAOT(char *aotOptions, void *feBase, TR_FrontEnd *fe)
    {
+   #if defined(NEW_OPTIONS)
+   if (!_newOptions)
+     { TR::CompilerOptionsManager::initialize(aotOptions);
+      _newOptions = TR::CompilerOptionsManager::getOptions();}
+   #endif
    // Create the default AOT command line options object
    // only do this if this the first time around we're processing options
    //
@@ -3030,7 +3040,31 @@ OMR::Options::findOptionSet(int32_t index, int32_t lineNum, const char *methodSi
 
    return optionSet;
    }
+#if defined(NEW_OPTIONS)
+   bool OMR::Options::getAnyOption(uint32_t mask){
+   bool TR::CompilerOptions::* memberPtr = TR::CompilerOptionsManager::getMemberPtrFromOldEnum(mask);
+   bool newOption = _newOptions->*(memberPtr);
+   bool option = ((_options[mask & TR_OWM] & (mask & ~TR_OWM)) != 0);
+   if (newOption != option){
+      return option;
+   }
+   return newOption;
+}
 
+void OMR::Options::setOption(uint32_t mask, bool b)
+{
+      bool TR::CompilerOptions::* memberPtr = TR::CompilerOptionsManager::getMemberPtrFromOldEnum(mask);
+      if (b){
+         _newOptions->*(memberPtr) = true;
+         _options[mask & TR_OWM] |= (mask & ~TR_OWM); 
+         }
+      else
+      {
+         _newOptions->*(memberPtr) = false;
+         _options[mask & TR_OWM] &= ~(mask & ~TR_OWM);
+      }
+}
+#endif
 
 void OMR::Options::setOptionInAllOptionSets(uint32_t mask, bool b)
    {

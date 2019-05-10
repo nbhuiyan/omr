@@ -142,11 +142,11 @@ int32_t commonJitInit(OMR::FrontEnd &fe, char *cmdLineOptions)
    {
    auto jitConfig = fe.jitConfig();
 
-   init_new_options(jitConfig,cmdLineOptions);
-
    if (init_options(jitConfig, cmdLineOptions) < 0)
       return -1;
 
+   init_new_options(jitConfig,cmdLineOptions);
+   
    // This doesn't make sense for non-Power platforms!
    //
    TR::Compiler->target.cpu.setProcessor(TR_DefaultPPCProcessor);
@@ -228,8 +228,8 @@ int32_t init_new_options(TR::JitConfig *jitConfig, char * cmdLineOptions)
       if (*cmdLineOptions == ':') cmdLineOptions ++;
       }
 
-   TR::CompilerOptionsManager::initialize(cmdLineOptions);
-
+   //TR::CompilerOptionsManager::initialize(cmdLineOptions);
+#if defined(NEW_OPTIONS_DEBUG)
    TR::CompilerOptions *compOpts = TR::CompilerOptionsManager::getOptions();
 
 
@@ -239,6 +239,7 @@ int32_t init_new_options(TR::JitConfig *jitConfig, char * cmdLineOptions)
    else {
       printf ("\nTest Option1 not set\n\n");
    }
+#endif
 #endif
    return 0;
 

@@ -78,9 +78,10 @@ void TR::OptionsBuilder::processEnvOptions(CompilerOptions * options){
 void TR::OptionsBuilder::processOption(CompilerOptions * options, char * optionString, int length){
 
     TR::OptionTableItem * optItem = TR::CompilerOptionsManager::getOptionTableEntry(optionString, length);
-
-    if (NULL == optItem) fprintf(stderr,"Option %s not in option table entries! Not processed.\n",optionString);
-    else optItem->fcn(optionString, (void *) options, optItem);
+    if (optItem) optItem->fcn(optionString, (void *) options, optItem);
+    #if defined(NEW_OPTIONS_DEBUG)
+    else fprintf(stderr,"Option %s not in option table entries! Not processed.\n",optionString);
+    #endif
 
     return;
 }

@@ -48,6 +48,7 @@ namespace OMR { typedef OMR::Options OptionsConnector; }
 #include "infra/Assert.hpp"
 #include "optimizer/Optimizations.hpp"
 #include "ras/DebugCounter.hpp"
+#include "control/CompilerOptionsManager.hpp"
 
 namespace TR { class CFGNode; }
 
@@ -1506,8 +1507,11 @@ public:
    static bool     hasSomeLogFile()      {return _hasLogFile;}
    static void     suppressLogFileBecauseDebugObjectNotCreated(bool b = true) {_suppressLogFileBecauseDebugObjectNotCreated = b;}
    static bool     requiresDebugObject();
-
+#if defined(NEW_OPTIONS)
+   bool getAnyOption(uint32_t mask);
+#else
    bool      getAnyOption(uint32_t mask)       {return (_options[mask & TR_OWM] & (mask & ~TR_OWM)) != 0;}
+#endif
    bool      getAllOptions(uint32_t mask)      {return (_options[mask & TR_OWM] & (mask & ~TR_OWM)) == mask;}
    bool      getOption(uint32_t mask);
 
@@ -1674,6 +1678,9 @@ public:
    int32_t getInlinerVeryLargeCompiledMethodThreshold() const {return _inlinerVeryLargeCompiledMethodThreshold;}
    int32_t getInlinerVeryLargeCompiledMethodFaninThreshold() const {return _inlinerVeryLargeCompiledMethodFaninThreshold;}
 
+#if defined(NEW_OPTIONS)
+   void setOption(uint32_t mask, bool b = true);
+#else
    void setOption(uint32_t mask, bool b = true)
       {
       if (b)
@@ -1681,6 +1688,7 @@ public:
       else
          _options[mask & TR_OWM] &= ~(mask & ~TR_OWM);
       }
+#endif
    static void setOptionInAllOptionSets(uint32_t mask, bool b = true);
    void setFixedOptLevel(int32_t level);
    void setTarget();
@@ -2225,6 +2233,9 @@ protected:
    static TR::OptionTable _jitOptions[];
    static TR::OptionTable _feOptions[];
    static TR::Options    *_cmdLineOptions;
+   #if defined (NEW_OPTIONS)
+   static TR::CompilerOptions *_newOptions;
+   #endif
    static TR::Options    *_jitCmdLineOptions;
    static TR::Options    *_aotCmdLineOptions;
           TR::OptionSet  *_optionSets;
