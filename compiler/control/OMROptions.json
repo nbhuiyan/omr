@@ -242,6 +242,15 @@
     "processing-fn": "setTrue",
     "subsettable": "no"
 },{
+    "name": "enableFullSpeedDebug",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_FullSpeedDebug",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
     "name": "traceLastOpt",
     "category": "L",
     "desc": "extra tracing for the opt corresponding to lastOptIndex; usually used with traceFull",
@@ -1454,6 +1463,24 @@
     "option-member": "TR_DisableAOTInstanceOfInlining",
     "type": "bool",
     "default": "false",
+    "processing-fn": "setTrue",
+    "subsettable": "no"
+},{
+    "name": "disableAOTAtCheapWarm",
+    "category": "O",
+    "desc":"disable AOT with cheap warm opt level",
+    "option-member": "TR_DisableAotAtCheapWarm",
+    "type": "bool",
+    "default": "false",
+    "processing-fn": "setTrue",
+    "subsettable": "no"
+},{
+    "name":"enableJITaaSHeuristics",
+    "category": "M",
+    "desc": "todo",
+    "option-member":"TR_EnableJITaaSHeuristics",
+    "type": "bool",
+    "default" : "false",
     "processing-fn": "setTrue",
     "subsettable": "no"
 },{
@@ -3193,6 +3220,24 @@
     "default": "false",
     "processing-fn": "setTrue",
     "subsettable": "no"
+},{
+    "name": "enableJITaaSDoLocalCompilesForRemoteCompiles",
+    "category": "M",
+    "desc": "todo",
+    "option-member":"TR_EnableJITaaSDoLocalCompilesForRemoteCompiles",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name": "disableZ15",
+    "category":"M",
+    "desc":"todo",
+    "option-member":"TR_DisableZ15",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
 },{
     "name": "disableDirectMemoryOps",
     "category": "O",
@@ -5614,4 +5659,211 @@
     "default": "false",
     "processing-fn": "setTrue",
     "subsettable": "no"
+},{
+    "name":"reportMethodEnter",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_ReportMethodEnter",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"reportMethodExit",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_ReportMethodExit",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"createPCMaps",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_CreatePCMaps",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"optimizeForSpace",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_OptimizeForSpace",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"TraceInfo",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_TraceInfo",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"CountOptTransformations",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_CountOptTransformations",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"EnableCompilationThread",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_EnableCompilationThread",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"HWProfileDeleteEmptyBlocks",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_HWProfileDeleteEmptyBlocks",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"DisableMonitorOpts",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_DisableMonitorOpts",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"DisableDFP",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_DisableDFP",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"DisableCallGraphInlining",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_DisableCallGraphInlining",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"DisableSSOpts",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_DisableSSOpts",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"DisableHysteresis",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_DisableHysteresis",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"EnableLargePages",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_EnableLargePages",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"VerboseOptTransformations",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_VerboseOptTransformations",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"AggressiveOpts",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_AggressiveOpts",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"NoClassGC",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_NoClassGC",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"Server",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_Server",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"AllowVPRangeNarrowingBasedOnDeclaredType",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_AllowVPRangeNarrowingBasedOnDeclaredType",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"TrustAllInterfaceTypeInfo",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_TrustAllInterfaceTypeInfo",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"HWProfilerDisableAOT",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_HWProfilerDisableAOT",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"HWProfilerDisableRIOverPrivateLinkage",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_HWProfilerDisableRIOverPrivateLinkage",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
+},{
+    "name":"IncreaseCountsForMethodsCompiledOutsideStartup",
+    "category":"M",
+    "desc":"todo",
+    "option-member": "TR_IncreaseCountsForMethodsCompiledOutsideStartup",
+    "type":"bool",
+    "default":"false",
+    "processing-fn":"setTrue",
+    "subsettable":"no"
 }]
