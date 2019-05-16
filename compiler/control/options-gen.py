@@ -110,7 +110,7 @@ class OptionTable:
 
     def get_hash_range(self):
         return self.get_maximum_hash_value() - self.get_minimum_hash_value()
-    
+
     def get_entry_at_index(self, index):
         return self._table_entries[index]
 
@@ -128,7 +128,7 @@ class OptionTable:
 
     def get_hashed_string_at_index(self, index):
         return self._hashed_strings[index]
-    
+
     def get_max_bucket_size(self):
         return self._max_bucket_size
 
@@ -233,7 +233,7 @@ class OptionsGenerator:
             else:
                 self._write_non_colliding_entry(table_writer, None)
             hash_value += 1
-    
+
         table_writer.write("{ }")
 
     # temporary mechanism to enable boolean option querying using the existing API
@@ -242,6 +242,12 @@ class OptionsGenerator:
 
         for option in self.option_members_written:
             writer.write("case " + option + ": return &TR::CompilerOptions::"+ option + ";\n" )
+
+    def write_option_enum_to_char_translating_switch(self, writer):
+        self._write_file_header(writer)
+
+        for option in self.option_members_written:
+            writer.write("case " + option + ": return \"" + option + "\";\n")
 
 
     def _write_file_header(self, writer):
@@ -274,7 +280,7 @@ class OptionsGenerator:
 
 """
         writer.write(header_text.format(datetime.datetime.now().year))
-    
+
     def _write_option_data_member(self, member_writer, initializer_writer, entry):
         option_member = entry["option-member"]
         if not ( option_member in self.option_members_written ): # currently writes boolean members only
@@ -315,7 +321,7 @@ class OptionsGenerator:
             self._write_option_data_member(member_writer, initializer_writer, entry)
             if index != colliding_indices[-1]:
                 table_writer.write(",")
-    
+
         table_writer.write("},\n")
 
 if __name__ == "__main__":
@@ -339,7 +345,7 @@ if __name__ == "__main__":
     cl_parser.add_argument("-platform",type=str,
                         default="",
                         help="Set this option to exclude/include platform-specific options") #todo
-                        
+
     cl_args = cl_parser.parse_args()
 
     if len(cl_args.outputdir) != 0:
@@ -362,9 +368,12 @@ if __name__ == "__main__":
         open(os.path.join(output_dir,"Options.inc"), "w") as member_writer, \
             open(os.path.join(output_dir, "OptionInitializerList.inc"), "w") as initializer_writer:
         options_generator.write_table_entries_and_data_members(table_writer, member_writer, initializer_writer)
-    
+
     with open(os.path.join(output_dir,"OptionTableProperties.inc"), "w") as writer:
         options_generator.write_hash_table_properties(writer)
 
     with open(os.path.join(output_dir,"OptionTranslatingSwitch.inc"), "w") as writer:
         options_generator.write_option_translating_switch(writer)
+
+    with open(os.path.join(output_dir,"OptionEnumToStringSwitch.inc"), "w") as writer:
+        options_generator.write_option_enum_to_char_translating_switch(writer)
