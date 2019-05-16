@@ -27,7 +27,11 @@
 namespace TR
 {
 
-
+/**
+ * @brief class CompilerOptions contains options data members.
+ * The members and their initializer list is determined at build time
+ *
+ */
 class CompilerOptions
    {
 
@@ -37,15 +41,12 @@ public:
 
     CompilerOptions() :
     #include "control/OptionInitializerList.inc"
-        unknownBooleanOption(false),
-        optionsProcessed(false)
+        unknownBooleanOption(false)
         {}
 
 
     #include "control/Options.inc"
     bool unknownBooleanOption;
-    bool optionsProcessed;
-
 
 }; /* Class CompilerOptions */
 

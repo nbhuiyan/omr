@@ -32,41 +32,125 @@ namespace OMR { typedef OMR::CompilerOptionsManager CompilerOptionsManagerConnec
 #include "control/CompilerOptions.hpp"
 #include "control/OptionTable.hpp"
 #include "control/OptionProcessors.hpp"
+#include "control/OptionsUtil.hpp"
 #include "env/TRMemory.hpp"
 #include "infra/Annotations.hpp"
-#include "control/Options.hpp"
+#include "infra/SimpleRegex.hpp"
 
 #include "control/OptionTableProperties.inc"
 
+namespace TR {class CompilerOptionsManager;}
+
 namespace OMR {
 
+/**
+ * @brief class CompilerOptionsManager serves as the primary interface for
+ * the new Options processing framework
+ */
 class OMR_EXTENSIBLE CompilerOptionsManager{
+
+protected:
+
+    /**
+     * @brief get the ptr to the most specialized implementation of CompilerOptions
+     *
+     * @return TR::CompilerOptionsManager*
+     */
+    TR::CompilerOptionsManager * self();
+
+    /**
+     * @brief The top-level options object. Currently this field is unused, as this responsibility
+     * is handled by TR::Options during the transition phase.
+     *
+     */
+    static TR::CompilerOptions         *_options;
+
+    /**
+     * @brief The compilerOptions manager static field
+     *
+     */
+    static TR::CompilerOptionsManager  *_optionsManager;
+    static TR::OptionSet *_optionSets;
 
 public:
     TR_ALLOC(TR_Memory::CompilerOptionsManager)
 
-    static TR::OptionTableItem _optionTable[][OPTION_TABLE_MAX_BUCKET_SIZE];
-    static const unsigned char _hashingValues[];
-    static TR::CompilerOptions         *_options;
-    static OMR::CompilerOptionsManager  *_optionsManager;
-
     /**
-     * temp
+     * @brief Process the command line options and set default values that can only be determined
+     * at runtime. Currently this is unused as option initialization is handled by TR::Options during
+     * the transition period
+     *
+     * @param cmdLineOptions[in] the commandline option string following -Xjit:
      */
     static void initialize(char * cmdLineOptions);
 
-    static TR::CompilerOptions * getOptions(){
-        return _options;
-    }
+    /**
+     * @brief Get the global CompilerOptions object
+     *
+     * @return TR::CompilerOptions*
+     */
+    static TR::CompilerOptions * getOptions(){ return _options;}
 
-    static TR::OptionTableItem * getOptionTableEntry(char * optionName, int length);
+    /**
+     * @brief Get the ptr to member of CompilerOptions corresponding to the existing
+     * TR_CompilationOptions enum value, which can be used to set/get option values in
+     * CompilerOptions class using the old API
+     *
+     * @param[in] option the TR_CompilationOptions enum value
+     * @return bool TR::CompilerOptions::* the member ptr
+     */
+    static bool TR::CompilerOptions::* getMemberPtrFromOldEnum(uint32_t option);
 
-    static bool TR::CompilerOptions::* getMemberPtrFromOldEnum(TR_CompilationOptions option);
+#if defined(NEW_OPTIONS_DEBUG)
+    /**
+     * @brief Get the Option Name From Old TR_CompilationOptions enum value
+     *
+     * @param[] option the TR_CompilationOptions enum value
+     * @return char * the option name
+     */
+    static char * getOptionNameFromOldEnum(uint32_t option);
+#endif
 
-private:
-    void setDefaults(); //only for jitbuilder
+    /**
+     * @brief Create a new CompilerOptions object
+     *
+     * @return TR::CompilerOptions*
+     */
+    static TR::CompilerOptions* createNewOptions();
 
-    void postProcess(); //
+    /**
+     * We do not need the optionString parameter. This is just temporary to allow us
+     * to use the existing OptionSet class
+     */
+
+    /**
+     * @brief Create a new OptionSet object and add it to the chain of option sets.
+     * We do not need the optionString parameter. This is just temporary to allow us
+     * to use the existing OptionSet class
+     *
+     * @param[in] optionString the option string starting at the start of the option set
+     * @return TR::OptionSet* the newly initialized OptionSet
+     */
+    static TR::OptionSet * createNewOptionSet(char * optionString);
+
+    /**
+     * @brief Get the CompilerOptions from the optionsets using method signature filter, and
+     * optionally the optLevel filter
+     *
+     * @param[in] methodSignature the method signature string
+     * @paramp[in] methodHotness the method hotness string
+     * @return TR::CompilerOptions* the CompilerOptions if a match has been found
+     */
+    static TR::CompilerOptions * getOptions(const char * methodSignature, const char * methodHotness = NULL);
+
+    /**
+     * @brief Get the CompilerOptions from the optionsets using line number or option set index
+     *
+     * @param[in] lineNum the line number in the limit file
+     * @paramp[in] index the option set index
+     * @return TR::CompilerOptions* the CompilerOptions if a match has been found
+     */
+    static TR::CompilerOptions * getOptions(int32_t lineNum, int32_t index = 0);
 
 }; /* class CompilerOptionsManager */
 

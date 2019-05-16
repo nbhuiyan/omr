@@ -23,29 +23,162 @@
 #define OPTIONS_BUILDER_HPP
 
 #include "control/CompilerOptionsManager.hpp"
+#include "control/OptionTableProperties.inc"
 
 namespace TR
 {
-    
-class OptionsBuilder{
-        
-private:
-    static const char * charValues;
-    
-    static void processOptionsString(CompilerOptions * options, char * optionString);
-        
-    static void processOption(CompilerOptions *options, char * optionString, int length);
 
+/**
+ * @brief class OptionsBuilder containing a collection of functions and data members used for
+ * processing command line and environment options
+ */
+class OptionsBuilder{
+
+private:
+
+    /**
+     * @brief Process the option string containing a list of options
+     *
+     * @param options[in] the CompilerOptions being processed
+     * @param optionString[in] the option string to process
+     */
+    static void processOptionString(CompilerOptions * options, char * optionString);
+
+    /**
+     * @brief Process an individual option by obtaining the option table entry for the
+     * option and calling the processing method
+     *
+     * @param options[out] the CompilerOptions being processed
+     * @param optionString[in] the option string to process
+     */
+    static void processOption(CompilerOptions * options, char * optionString);
+
+    /**
+     * @brief Handle an option set
+     *
+     * @param options[in] the CompilerOptions being processed
+     * @param optionString[in] the remaining option string to process
+     *
+     * @return char * the remaining option string to process
+     */
+    static char * handleOptionSet(CompilerOptions * options, char * optionString);
+
+    /**
+     * @brief Handle an individual option
+     *
+     * @param options[out] the CompilerOptions to write to
+     * @param optionString[in] the remaining option string to process
+     *
+     * @return char * the remaining option string to process
+     */
+    static char * handleOption(CompilerOptions * options, char * optionString);
+
+    /**
+     * @brief Handle method signature (and optionally opt-level) regular expression filter
+     *
+     * @param options[in] the CompilerOptions being processed
+     * @param optionString[in] the remaining option string to process
+     *
+     * @return char * the remaining option string to process
+     */
+    static char * handleMethodRegexFilter(CompilerOptions * options, char * optionString);
+
+    /**
+     * @brief Handle limit file (verbose log) line range (or specific line) filter
+     *
+     * @param options[in] the CompilerOptions being processed
+     * @param optionString[in] the remaining option string to process
+     *
+     * @return char * the remaining option string to process
+     */
+    static char * handleLimitFileLineRangeFilter(CompilerOptions * options, char * optionString);
+
+    /**
+     * @brief Handle option set index filter
+     *
+     * @param options[in] the CompilerOptions being processed
+     * @param optionString[in] the remaining option string to process
+     *
+     * @return char * the remaining option string to process
+     */
+    static char * handleOptionSetIndexFilter(CompilerOptions * options, char * optionString);
+
+    /**
+     * @brief Get the option length including the length of the option parameter and '='
+     *
+     * @param optionString[in] the ptr to the option string pointing to the start of the option
+     * @return size_t the length of the option string including parameter
+     */
+    static size_t getOptionLength(char * optionString);
+
+    /**
+     * @brief Get the option name length (excludes option parameters)
+     *
+     * @param optionString[in] the option string being processed
+     * @return size_t the length of the option name
+     */
+    static size_t getOptionNameLength(char * optionString);
+
+    /**
+     * Get option parameter length i.e, the part after '=' in the option
+     * This should return a positive number. This will return -1 if the
+     * option does not have a parameter
+     */
+
+    /**
+     * @brief Get option parameter length i.e, the part after '=' in the option
+     * This should return a positive number. This will return -1 if the
+     * option does not have a parameter and 0 if the parameter is empty
+     *
+     * @param optionString[in] the option string being processed
+     * @return size_t the length of the option parameter
+     * @return -1 if no parameter
+     * @return 0 if empty parameter
+     */
+    static size_t getOptionParameterLength(char * optionString);
+
+    /**
+     * @brief Get the Option Table Entry from the hash table
+     *
+     * @param optionString[in] the option string ptr at the current option being processed
+     * @return TR::OptionTableItem* the entry in the option table
+     */
+    static TR::OptionTableItem * getOptionTableEntry(char * optionString);
+
+    /**
+     * @brief A 2D array representing the option hash table generated at build time
+     * and laid out in OptionTableEntries.inc
+     */
+    static TR::OptionTableItem _optionTable[][OPTION_TABLE_MAX_BUCKET_SIZE];
+
+    /**
+     * @brief The character values used for calculating hash values from the option names
+     * in the option string. The values are determined at build time and laid out in
+     * OptionCharMap.inc
+     */
+    static const unsigned char _hashingValues[];
 
 public:
-        
+
+    /**
+     * @brief Process the command line option string
+     *
+     * @param options[out] the "global" options object
+     * @param optionString[in] the command-line option string after -Xjit:
+     */
     static void processCmdLineOptions(CompilerOptions *options, char * optionString);
-        
-    static void processEnvOptions(CompilerOptions * options);
-    
+
+    /**
+     * @brief Process the environment options
+     *
+     * @param options[out] the "global" options object
+     * @param isAOT[in] default False, determines whether to check TR_Options or TR_OptionsAOT
+     */
+    static void processEnvOptions(CompilerOptions * options, bool isAOT = false);
+
 }; /* class OptionsBuilder */
 
 
-} /* namespace OMR */
+} /* namespace TR */
 
 #endif /* OPTIONS_BUILDER_HPP */

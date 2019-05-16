@@ -142,10 +142,19 @@ int32_t commonJitInit(OMR::FrontEnd &fe, char *cmdLineOptions)
    {
    auto jitConfig = fe.jitConfig();
 
-   init_new_options(jitConfig,cmdLineOptions);
-
    if (init_options(jitConfig, cmdLineOptions) < 0)
       return -1;
+
+#if defined(NEW_OPTIONS_DEBUG)
+   // Just a sanity check to see if new options have been initialized
+   TR::CompilerOptions * compOpts = TR::Options::getCmdLineOptions()->getNewOptions();
+   if (compOpts->TR_TestOption1){
+      printf("\nTest Option1 set\n\n");
+   }
+   else {
+      printf ("\nTest Option1 not set\n\n");
+   }
+#endif
 
    // This doesn't make sense for non-Power platforms!
    //
@@ -217,31 +226,6 @@ int32_t init_options(TR::JitConfig *jitConfig, char *cmdLineOptions)
 
    TR::Options::getCmdLineOptions()->setTarget();
    return 0;
-   }
-
-int32_t init_new_options(TR::JitConfig *jitConfig, char * cmdLineOptions)
-   {
-#if defined(NEW_OPTIONS)
-   if (cmdLineOptions && (0 == strncmp("-Xjit",cmdLineOptions,5)))
-      {
-      cmdLineOptions += 5;
-      if (*cmdLineOptions == ':') cmdLineOptions ++;
-      }
-
-   TR::CompilerOptionsManager::initialize(cmdLineOptions);
-
-   TR::CompilerOptions *compOpts = TR::CompilerOptionsManager::getOptions();
-
-
-   if (compOpts->TR_TestOption1){
-      printf("\nTest Option1 set\n\n");
-   }
-   else {
-      printf ("\nTest Option1 not set\n\n");
-   }
-#endif
-   return 0;
-
    }
 
 static bool methodCanBeCompiled(OMR::FrontEnd *fe, TR_ResolvedMethod &method, TR_FilterBST *&filter, TR_Memory *trMemory)

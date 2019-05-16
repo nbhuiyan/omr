@@ -19,260 +19,119 @@
  * SPDX-License-Identifier: EPL-2.0 OR Apache-2.0 OR GPL-2.0 WITH Classpath-exception-2.0 OR LicenseRef-GPL-2.0 WITH Assembly-exception
  *******************************************************************************/
 
-#include "control/OMRCompilerOptionsManager.hpp"
-#include "control/OptionsBuilder.hpp"
-#include "codegen/FrontEnd.hpp"
 #include <cstdlib>
 #include <cstring>
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
+#include "control/OMRCompilerOptionsManager.hpp"
+#include "control/OptionsBuilder.hpp"
+#include "codegen/FrontEnd.hpp"
+#include "infra/Assert.hpp"
+#include "control/Options.hpp"
 
-OMR::CompilerOptionsManager * OMR::CompilerOptionsManager::_optionsManager = 0;
+TR::CompilerOptionsManager * OMR::CompilerOptionsManager::_optionsManager = 0;
 TR::CompilerOptions * OMR::CompilerOptionsManager::_options = 0;
+TR::OptionSet * OMR::CompilerOptionsManager::_optionSets = 0;
 
-TR::OptionTableItem OMR::CompilerOptionsManager::_optionTable[][OPTION_TABLE_MAX_BUCKET_SIZE] = {
-
-#include "control/OptionTableEntries.inc"
-
-};
-
-const unsigned char OMR::CompilerOptionsManager::_hashingValues[] = {
-
-#include "control/OptionCharMap.inc"
-
-};
-
+TR::CompilerOptionsManager*
+OMR::CompilerOptionsManager::self(){
+   return static_cast<TR::CompilerOptionsManager*>(this);
+}
 
 void
 OMR::CompilerOptionsManager::initialize(char * cmdLineOptions){
-
-    _optionsManager = new (PERSISTENT_NEW) OMR::CompilerOptionsManager();
+#if 0
+   /* Currently disabled because the options initialization is currently
+   happening in the existing options class */
+    _optionsManager = new (PERSISTENT_NEW) TR::CompilerOptionsManager();
     _options = new (PERSISTENT_NEW) TR::CompilerOptions();
 
-    _optionsManager->setDefaults();
+    //_optionsManager->setDefaults();
 
     TR::OptionsBuilder::processCmdLineOptions(_options,cmdLineOptions);
 
     TR::OptionsBuilder::processEnvOptions(_options);
 
-    _optionsManager->postProcess();
+    //_optionsManager->postProcess();
 
     _options->optionsProcessed = true;
-
+#endif
     return;
 }
 
-TR::OptionTableItem *
-OMR::CompilerOptionsManager::getOptionTableEntry(char * optionName, int length){
-   
-   char c;
-   char * optionNamePtr = optionName;
-   int hash = 5381;
-   while ((c = *optionNamePtr++)){
-      hash = ((hash * 7) + _hashingValues[c]) % OPTION_TABLE_SIZE;
-   }
-
-   if (0 == _optionTable[hash][0].optionName){
-      return NULL;
-   } else {
-      char * entryNamePtr;
-      for (int i = 0; i < OPTION_TABLE_MAX_BUCKET_SIZE; i++){
-         entryNamePtr = _optionTable[hash][i].optionName;
-         if (0 == entryNamePtr){
-            break;
-         }
-         optionNamePtr = optionName;
-         if (length == strlen(entryNamePtr)){
-            char c1, c2;
-            int diff = 0;
-            while ((c1 = *entryNamePtr++) && ((c2 = *optionNamePtr++))){
-               diff = _hashingValues[c1] - _hashingValues[c2];
-               if (diff != 0) break;
-            }
-            if (diff == 0) return &_optionTable[hash][i];
-         }
-      }
-      return NULL;
-   }
-}
-
 bool TR::CompilerOptions::*
-OMR::CompilerOptionsManager::getMemberPtrFromOldEnum(TR_CompilationOptions option){
-   switch(option){
+OMR::CompilerOptionsManager::getMemberPtrFromOldEnum(uint32_t option){
+   switch (option){
       #include "control/OptionTranslatingSwitch.inc"
-      default: return &TR::CompilerOptions::unknownBooleanOption;
+      default:
+//#if defined(NEW_OPTIONS_DEBUG)
+      //fprintf(stderr, "Warning! Unknown boolean option queried!\n");
+//#endif
+         return &TR::CompilerOptions::unknownBooleanOption;
+
+   return &TR::CompilerOptions::unknownBooleanOption;
    };
 }
 
-void
-OMR::CompilerOptionsManager::setDefaults(){ 
-   // This is to mimic some of the defaults set up in the old Options class, and not
-   // how the options will actually be set up
-
-    _options->TR_RestrictStaticFieldFolding = true;
-
-#if defined(TR_HOST_ARM)
-   // alignment problem for float/double
-   _options->TR_DisableIntrinsics = true;
+#if defined(NEW_OPTIONS_DEBUG)
+char *
+OMR::CompilerOptionsManager::getOptionNameFromOldEnum(uint32_t option){
+   switch (option){
+      #include "control/OptionEnumToStringSwitch.inc"
+      default: return "Uknown option";
+   }
+}
 #endif
 
-#if defined(RUBY_PROJECT_SPECIFIC)
-   // Ruby has been known to spawn other Ruby VMs.  Log filenames must be unique
-   // or corruption will occur.
-   //
-   bool forceSuffixLogs = true;
-#else
-#if defined(DEBUG) || defined(PROD_WITH_ASSUMES)
-   bool forceSuffixLogs = false;
-#else
-   bool forceSuffixLogs = true;
-#endif
-#endif
-
-   if (forceSuffixLogs)
-      _options->TR_EnablePIDExtension = true;
-
-
-   // The signature-hashing seed algorithm it the best default.
-   // Unless the user specifies randomSeed=nosignature, we want to override the
-   // default seed we just set above in order to improve reproducibility.
-   //
-   _options->TR_RandomSeedSignatureHash = true;
-   _options->TR_DisableRefinedAliases = true;
-
-   _options->TR_DisableTreePatternMatching = true;
-   _options->TR_DisableHalfSlotSpills = true;
-
-#if defined(TR_TARGET_64BIT)
-   _options->TR_EnableCodeCacheConsolidation = true;
-#endif
-
-    // disable the fanin heuristics & virtual scratch memory for non-java frontends!
-    _options->TR_DisableInlinerFanIn = true;
-    _options->TR_DisableInlineEXTarget = true;
+TR::CompilerOptions*
+OMR::CompilerOptionsManager::createNewOptions(){
+   TR::CompilerOptions* newOptions = new (PERSISTENT_NEW) TR::CompilerOptions();
+   return newOptions;
 }
 
-void OMR::CompilerOptionsManager::postProcess(){
+TR::OptionSet*
+OMR::CompilerOptionsManager::createNewOptionSet(char * optionString){
+   TR::OptionSet* newOptionSet = new (PERSISTENT_NEW) TR::OptionSet(optionString);
+   newOptionSet->setNext(_optionSets);
+   _optionSets = newOptionSet;
+   return newOptionSet;
+}
 
-#if defined(TR_HOST_ARM)
-   // OSR is not available for ARM yet
-   _options->TR_DisableOSR = true;
-   _options->TR_EnableOSR = false;
-   _options->TR_EnableOSROnGuardFailure = false;
-#endif
-
-#ifndef J9_PROJECT_SPECIFIC
-   _options->TR_DisableNextGenHCR = true;
-#endif
-
-   static const char *ccr = feGetEnv("TR_DisableCCR");
-   if (ccr)
-      {
-      _options->TR_DisableCodeCacheReclamation = true;
-      }
-   static const char *disableCCCF = feGetEnv("TR_DisableClearCodeCacheFullFlag");
-   if (disableCCCF)
-      {
-      _options->TR_DisableClearCodeCacheFullFlag = true;
-      }
-/* 
-   if (_options->TR_FullSpeedDebug)
-      {
-      if (!_options->TR_DisableOSR)
-         _options->TR_EnableOSR = true; // Make OSR the default for FSD
-
-      _options->TR_DisableMethodHandleThunks = true; // Can't yet transition a MH thunk frame into equivalent interpreter frames
-      }
-*/
-   if (_options->TR_EnableOSROnGuardFailure && !_options->TR_DisableOSR)
-      _options->TR_EnableOSR = true;
-
-   if (TR::Compiler->om.mayRequireSpineChecks())
-      {
-      _options->TR_DisableInternalPointers = true;
-      if (TR::Options::getCmdLineOptions()->getFixedOptLevel() == -1 && _options->TR_InhibitRecompilation)
-         {
-         _options->TR_DisableUpgradingColdCompilations = true;
-         _options->TR_DisableGuardedCountingRecompilations = true;
-         _options->TR_DisableDynamicLoopTransfer = true;
-         _options->TR_DisableEDO = true;
-         _options->TR_DisableAggressiveRecompilations = true;
-         _options->TR_EnableHardwareProfileRecompilation = false;
+TR::CompilerOptions *
+OMR::CompilerOptionsManager::getOptions(const char * methodSignature, const char * methodHotness){
+   for (TR::OptionSet * optionSet = _optionSets; optionSet; optionSet = optionSet->getNext()){
+         if (optionSet->getMethodRegex()){
+            if (TR::SimpleRegex::match(optionSet->getMethodRegex(), methodSignature)){
+               if (optionSet->getOptLevelRegex()){
+                  if (TR::SimpleRegex::matchIgnoringLocale(optionSet->getOptLevelRegex(), methodHotness)){
+                     return optionSet->getNewOptions();
+                  }
+               }
+               else{
+                  return optionSet->getNewOptions();
+               }
+            }
          }
-      // If the intent was to start with warm, disable downgrades
+   }
 
-      //if (TR::Options::getCmdLineOptions()->_initialOptLevel == warm)
-      //   _options->TR_DontDowngradeToCold);
+   return NULL;
+}
 
-      // enable by default rampup improvements
-      if (!TR::Options::getCmdLineOptions()->getOption(TR_DisableRampupImprovements))
-         {
-         _options->TR_EnableDowngradeOnHugeQSZ = true;
-         _options->TR_EnableMultipleGCRPeriods = true;
-         // enable GCR filtering
-
-
-#ifdef LINUX // On Linux compilation threads can be starved
-         _options->TR_EnableAppThreadYield = true;
-#endif
-#if defined(TR_TARGET_X86)
-         // Currently GCR patching only works correctly on x86
-         _options->TR_EnableGCRPatching = true;
-#endif
-         }
-      if (_options->TR_DisableRampupImprovements)
-         {
-         _options->TR_DisableConservativeHotRecompilationForServerMode = true;
-         }
-
-      if (TR::Options::getCmdLineOptions()->getOption(TR_ConservativeCompilation))
-         _options->TR_ConservativeCompilation = true;
-
-      if (TR::Options::isQuickstartDetected()
-#if defined(J9ZOS390)
-         || sharedClassCache()  // Disable GCR for zOS if SharedClasses/AOT is used
-#endif
-         )
-         {
-         // Disable GCR in quickstart mode, but provide the option to enable it
-         static char *gcr = feGetEnv("TR_EnableGuardedCountingRecompilations");
-         if (!gcr)
-            _options->TR_DisableGuardedCountingRecompilations = true;
-         }
-
-         // To minimize risk, don't use this feature for non-AOT cases
-         // Note that information about AOT is only available in late processing stages
-         _options->TR_ActivateCompThreadWhenHighPriReqIsBlocked = false;
-
-      // If Iprofiler is disabled we will not have block frequencies so we should
-      // disable the logic that makes inlining more conservative based on block frequencies
-      if (_options->TR_DisableInterpreterProfiling)
-         {
-         _options->TR_DisableConservativeInlining = true;
-         _options->TR_DisableConservativeColdInlining = true;
-         }
-
-      if (_options->TR_DisableCompilationThread)
-         _options->TR_DisableNoVMAccess = true;
-
-      // YieldVMAccess and NoVMAccess are incompatible. If the user enables YieldVMAccess
-      // make sure NoVMAccess is disabled
-      //
-      if (_options->TR_EnableYieldVMAccess && !_options->TR_DisableNoVMAccess)
-         _options->TR_DisableNoVMAccess = true;
+TR::CompilerOptions *
+OMR::CompilerOptionsManager::getOptions(int32_t lineNum, int32_t index){
+   if (index){
+      for (TR::OptionSet * optionSet = _optionSets; optionSet; optionSet = optionSet->getNext()){
+         if (optionSet->getIndex() == index)
+            return optionSet->getNewOptions();
       }
-
-   if (_options->TR_ImmediateCountingRecompilation)
-      _options->TR_EnableGCRPatching = false;
-
-   if (_options->TR_DisableLockResevation)
-      {
-         _options->TR_ReservingLocks = false;
+   }
+   else if(lineNum){
+      for (TR::OptionSet * optionSet = _optionSets; optionSet; optionSet = optionSet->getNext()){
+         if ((optionSet->getStart() <= lineNum) && (optionSet->getEnd() >= lineNum))
+            return optionSet->getNewOptions();
       }
-#if defined(TR_HOST_S390)
-   // Lock reservation without OOL has not implemented on Z
-   if (_options->TR_DisableOOL)
-      _options->TR_ReservingLocks = false;
-#endif
+   }
+
+   return NULL;
 }
