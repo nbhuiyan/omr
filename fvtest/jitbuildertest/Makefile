@@ -36,11 +36,11 @@ OBJECTS := \
 	NegateTest \
 	WorklistTest \
 	IfThenElseTest \
+  SelectTest \
 	CallReturnTest \
 	FieldNameTest \
 	ConvertBitsTest \
-	UnsignedDivRemTest \
-  SelectTest
+	UnsignedDivRemTest
 
 OBJECTS := $(addsuffix $(OBJEXT),$(OBJECTS))
 
