@@ -2679,6 +2679,20 @@ OMR::IlBuilder::MakeCase(int32_t caseValue, TR::IlBuilder **caseBuilder, int32_t
    return c;
    }
 
+TR::IlValue *
+OMR::IlBuilder::Select(TR::IlValue * condition, TR::IlValue * trueValue, TR::IlValue * falseValue){
+   TR_ASSERT(condition != NULL && trueValue != NULL && falseValue != NULL,
+                     "SelectIf requires condition, trueValue and falseValue");
+   TR_ASSERT(trueValue->getDataType() == falseValue->getDataType(), "Value type mismatch");
+   TR::Node * conditionNode = loadValue(condition);
+   TR::Node * ifTrueNode = loadValue(trueValue);
+   TR::Node * ifFalseNode = loadValue(falseValue);
+   TR::ILOpCodes opCode = TR::ILOpCode::ternaryOpCode(trueValue->getDataType());
+   TR::Node * resultNode = createWithoutSymRef(opCode, 3, conditionNode, ifTrueNode, ifFalseNode);
+   TR::IlValue * result = newValue(trueValue->getDataType(), resultNode);
+   return result;
+}
+
 TR::IlBuilder::JBCase **
 OMR::IlBuilder::createCaseArray(uint32_t numCases, va_list args)
    {
