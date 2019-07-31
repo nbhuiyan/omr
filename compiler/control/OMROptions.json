@@ -431,28 +431,10 @@
     "processing-fn": "setTrue",
     "subsettable": "no"
 },{
-    "name": "sinkAllBlockedStores",
-    "category": "O",
-    "desc": "in trivialStoreSinking sink all stores that are blocked by a killed sym by creating an anchor",
-    "option-member": "TR_SinkAllBlockedStores",
-    "type": "bool",
-    "default": "false",
-    "processing-fn": "setTrue",
-    "subsettable": "no"
-},{
     "name": "rtGCMapCheck",
     "category": "D",
     "desc": "Enable runtime GC Map checking at every async check.",
     "option-member": "TR_RTGCMapCheck",
-    "type": "bool",
-    "default": "false",
-    "processing-fn": "setTrue",
-    "subsettable": "no"
-},{
-    "name": "sinkAllStores",
-    "category": "O",
-    "desc": "in trivialStoreSinking sink all stores possible by agressively creating anchors for indirect loads and killed syms",
-    "option-member": "TR_SinkAllStores",
     "type": "bool",
     "default": "false",
     "processing-fn": "setTrue",
@@ -998,15 +980,6 @@
     "processing-fn": "setTrue",
     "subsettable": "no"
 },{
-    "name": "enableTrivialStoreSinking",
-    "category": "O",
-    "desc": "enable trivial store sinking",
-    "option-member": "TR_EnableTrivialStoreSinking",
-    "type": "bool",
-    "default": "false",
-    "processing-fn": "setTrue",
-    "subsettable": "no"
-},{
     "name": "enableRIEMIT",
     "category": "O",
     "desc": "Allows the z Codegen to emit RIEMIT instructions",
@@ -1238,6 +1211,15 @@
     "option-member": "TR_DisablePeekAOTResolutions",
     "type": "bool",
     "default": "false",
+    "processing-fn": "setTrue",
+    "subsettable": "no"
+},{
+    "name": "disableAOTBytesCompression",
+    "category": "O",
+    "desc": "disable compressing AOT bytes",
+    "option-member":"TR_DisableAOTBytesCompression",
+    "type" : "bool",
+    "default" : "false",
     "processing-fn": "setTrue",
     "subsettable": "no"
 },{
@@ -2240,15 +2222,6 @@
     "processing-fn": "setTrue",
     "subsettable": "no"
 },{
-    "name": "disableTrivialStoreSinking",
-    "category": "O",
-    "desc": "disable trivial store sinking",
-    "option-member": "TR_EnableTrivialStoreSinking",
-    "type": "bool",
-    "default": "false",
-    "processing-fn": "setFalse",
-    "subsettable": "no"
-},{
     "name": "disableSIMDArrayCopy",
     "category": "O",
     "desc": "Disable vectorized array copying using SIMD instruction",
@@ -2346,15 +2319,6 @@
     "type": "bool",
     "default": "false",
     "processing-fn": "setFalse",
-    "subsettable": "no"
-},{
-    "name": "enableLinkagePreserveStrategy2",
-    "category": "O",
-    "desc": "enable linkage strategy 2",
-    "option-member": "TR_LinkagePreserveStrategy2",
-    "type": "bool",
-    "default": "false",
-    "processing-fn": "setTrue",
     "subsettable": "no"
 },{
     "name": "disableStringPeepholes",
@@ -2879,15 +2843,6 @@
     "processing-fn": "setTrue",
     "subsettable": "no"
 },{
-    "name": "disableNewLoopTransfer",
-    "category": "O",
-    "desc": "disable loop transfer for virtual guards",
-    "option-member": "TR_DisableNewLoopTransfer",
-    "type": "bool",
-    "default": "false",
-    "processing-fn": "setTrue",
-    "subsettable": "no"
-},{
     "name": "unresolvedSymbolsAreNotColdAtCold",
     "category": "R",
     "desc": "Mark unresolved symbols as cold blocks at cold or lower",
@@ -3225,15 +3180,6 @@
     "category": "M",
     "desc": "todo",
     "option-member":"TR_EnableJITaaSDoLocalCompilesForRemoteCompiles",
-    "type":"bool",
-    "default":"false",
-    "processing-fn":"setTrue",
-    "subsettable":"no"
-},{
-    "name": "disableZ15",
-    "category":"M",
-    "desc":"todo",
-    "option-member":"TR_DisableZ15",
     "type":"bool",
     "default":"false",
     "processing-fn":"setTrue",
@@ -4652,15 +4598,6 @@
     "processing-fn": "setTrue",
     "subsettable": "no"
 },{
-    "name": "disableStoreAnchoring",
-    "category": "O",
-    "desc": "in trivialStoreSinking disable store child anchoring and therefore more aggressively duplicate trees",
-    "option-member": "TR_DisableStoreAnchoring",
-    "type": "bool",
-    "default": "false",
-    "processing-fn": "setTrue",
-    "subsettable": "no"
-},{
     "name": "disableGCRPatching",
     "category": "R",
     "desc": "disable patching of the GCR guard",
@@ -4746,15 +4683,6 @@
     "category": "O",
     "desc": "disable tracing of various BCD perf opportunities",
     "option-member": "TR_DisableBCDOppTracing",
-    "type": "bool",
-    "default": "false",
-    "processing-fn": "setTrue",
-    "subsettable": "no"
-},{
-    "name": "sinkOnlyCCStores",
-    "category": "O",
-    "desc": "in trivialStoreSinking only sink stores that are to the psw.cc symbol",
-    "option-member": "TR_SinkOnlyCCStores",
     "type": "bool",
     "default": "false",
     "processing-fn": "setTrue",
@@ -5109,15 +5037,6 @@
     "type": "bool",
     "default": "false",
     "processing-fn": "setFalse",
-    "subsettable": "no"
-},{
-    "name": "enableElementPrivatization",
-    "category": "O",
-    "desc": "enable privatization of stack declared elements accessed by const indices",
-    "option-member": "TR_EnableElementPrivatization",
-    "type": "bool",
-    "default": "false",
-    "processing-fn": "setTrue",
     "subsettable": "no"
 },{
     "name": "checkStructureDuringExitExtraction",
