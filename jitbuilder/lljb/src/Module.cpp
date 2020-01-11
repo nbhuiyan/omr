@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2019 IBM Corp. and others
+ * Copyright (c) 2019, 2020 IBM Corp. and others
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which accompanies this
@@ -39,9 +39,15 @@ Module::Module(const char * filename, llvm::SMDiagnostic &SMDiags, llvm::LLVMCon
     }
     else {
         _constructed = true;
+        llvm::outs() << "Module loaded:" << _llvmModule->getModuleIdentifier() << "\n";
     }
-    llvm::outs() << "Module loaded:" << _llvmModule->getModuleIdentifier() << "\n";
-
+    /* TODO: In Calling Program (e.g. lljb_run Test Harness); Guard Against Segfaults, After Caling the Constructor, with the Following:
+     * if(!module.isConstructed())
+     * {
+     *     std::cout << "Error: Couldn't Construct lljb/llvm Module!" << std::endl << "Exiting..." << std::endl;
+     *     return -1;
+     * }
+     */
 }
 
 llvm::Function * Module::getMainFunction(){

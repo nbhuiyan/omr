@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2019 IBM Corp. and others
+ * Copyright (c) 2019, 2020 IBM Corp. and others
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which accompanies this
@@ -42,6 +42,7 @@ public:
 
     std::unique_ptr<llvm::Module>& getLLVMModule(){return _llvmModule;}
 
+    bool isConstructed(){return _constructed;};
     int32_t numFunctions(){ return _llvmModule->getFunctionList().size();}
     llvm::simple_ilist<llvm::Function>::iterator
         funcIterBegin(){return _llvmModule->getFunctionList().begin();}
