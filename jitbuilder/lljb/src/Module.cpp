@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2019 IBM Corp. and others
+ * Copyright (c) 2019, 2020 IBM Corp. and others
  *
  * This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License 2.0 which accompanies this
@@ -26,6 +26,7 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/SourceMgr.h"
 
+#include <fstream>
 
 namespace lljb{
 
@@ -33,6 +34,16 @@ Module::Module(const char * filename, llvm::SMDiagnostic &SMDiags, llvm::LLVMCon
             : _llvmModule(nullptr),
               _constructed(false),
               _filename(filename) {
+
+    //Check the passed in filename/path before going any further:
+    std::ifstream filepath(filename);
+    if(!filepath.good())
+    {
+        std::cout << "Error: filename: '" << filename << "' isn's a valid file path!" << std::endl << "Exiting..." << std::endl;
+        return -1;
+    }
+    filepath.close();
+
     _llvmModule = (llvm::parseIRFile(_filename, SMDiags, context));
     if (!_llvmModule){
         SMDiags.print(_filename, llvm::errs());
