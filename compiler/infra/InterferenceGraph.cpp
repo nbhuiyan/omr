@@ -225,38 +225,40 @@ void TR_InterferenceGraph::virtualRemoveNodeFromIG(TR_IGNode *igNode)
 // Partition the nodes identified by the 'workingSet' bit vector into sets
 // based on their degree.
 //
-void TR_InterferenceGraph::partitionNodesIntoDegreeSets(CS2::ABitVector<TR::Allocator> &workingSet,
-                                                        CS2::ABitVector<TR::Allocator> &colourableDegreeSet,
-                                                        CS2::ABitVector<TR::Allocator> &notColourableDegreeSet)
+void TR_InterferenceGraph::partitionNodesIntoDegreeSets(TR_BitVector *workingSet, TR_BitVector *colourableDegreeSet,
+                                                        TR_BitVector *notColourableDegreeSet)
    {
    int32_t               i;
-   CS2::ABitVector<TR::Allocator>::Cursor bvc(workingSet);
+   //CS2::ABitVector<TR::Allocator>::Cursor bvc(workingSet);
+   TR_BitVectorIterator bvi(*workingSet);
 
    TR_ASSERT(getNumColours() > 0,
           "can't partition without knowing the number of available colours\n");
 
    // Empty the existing degree sets.
    //
-   colourableDegreeSet.Clear();
-   colourableDegreeSet.GrowTo(getNumColours());
-   notColourableDegreeSet.Clear();
-   notColourableDegreeSet.GrowTo(getNumColours());
+   //colourableDegreeSet.Clear();
+   //colourableDegreeSet.GrowTo(getNumColours());
+   //notColourableDegreeSet.Clear();
+   //notColourableDegreeSet.GrowTo(getNumColours());
+   colourableDegreeSet->empty();
+   notColourableDegreeSet->empty();
 
    // Partition the specified nodes into sets based on their working degree.
    //
-   for(bvc.SetToFirstOne(); bvc.Valid(); bvc.SetToNextOne())
-     {
-     i = bvc;
+   while (bvi.hasMoreElements())
+      {
+      i = bvi.getNextElement();
 
-     if (getNodeTable(i)->getWorkingDegree() < getNumColours())
-       {
-       colourableDegreeSet[i] = 1;
-       }
-     else
-       {
-       notColourableDegreeSet[i] = 1;
-       }
-     }
+      if (getNodeTable(i)->getWorkingDegree() < getNumColours())
+         {
+         colourableDegreeSet->set(i);
+         }
+      else
+         {
+         notColourableDegreeSet->set(i);
+         }
+      }
 
 #ifdef DEBUG
    if (debug("traceIG"))
@@ -344,13 +346,16 @@ bool TR_InterferenceGraph::simplify()
 
    if (getNumNodes()==0) return true;
 
-   CS2::ABitVector<TR::Allocator> workingSet(comp()->allocator());
-   workingSet.SetAll(getNumNodes());
+   //CS2::ABitVector<TR::Allocator> workingSet(comp()->allocator());
+   TR_BitVector *workingSet = new (trStackMemory()) TR_BitVector(getNumNodes(), trMemory(), stackAlloc);
+   workingSet->setAll(getNumNodes());
 
-   CS2::ABitVector<TR::Allocator> colourableDegreeSet(comp()->allocator());
-   CS2::ABitVector<TR::Allocator> notColourableDegreeSet(comp()->allocator());
-   colourableDegreeSet.GrowTo(getNumNodes());
-   notColourableDegreeSet.GrowTo(getNumNodes());
+   //CS2::ABitVector<TR::Allocator> colourableDegreeSet(comp()->allocator());
+   //CS2::ABitVector<TR::Allocator> notColourableDegreeSet(comp()->allocator());
+   //colourableDegreeSet.GrowTo(getNumNodes());
+   //notColourableDegreeSet.GrowTo(getNumNodes());
+   TR_BitVector * colourableDegreeSet = new (trStackMemory()) TR_BitVector(getNumNodes(), trMemory(), stackAlloc);
+   TR_BitVector * notColourableDegreeSet = new (trStackMemory()) TR_BitVector(getNumNodes(), trMemory(), stackAlloc);
 
    for (i=0; i<getNumNodes(); i++)
       {
@@ -360,29 +365,30 @@ bool TR_InterferenceGraph::simplify()
       igNode->setColour(UNCOLOURED);
       }
 
-   while (!workingSet.IsZero())
+   while (!workingSet->isEmpty())
       {
       partitionNodesIntoDegreeSets(workingSet,colourableDegreeSet,notColourableDegreeSet);
 
       // Push nodes from the colourable set onto the stack and adjust the degrees of
       // their neighbours until there are no nodes remaining in the colourable set.
       //
-      if (!colourableDegreeSet.IsZero())
+      if (!colourableDegreeSet->isEmpty())
          {
-         CS2::ABitVector<TR::Allocator>::Cursor colourableCursor(colourableDegreeSet);
+         //CS2::ABitVector<TR::Allocator>::Cursor colourableCursor(colourableDegreeSet);
+         TR_BitVectorIterator bvi(*colourableDegreeSet);
 
-         for(colourableCursor.SetToFirstOne(); colourableCursor.Valid(); colourableCursor.SetToNextOne())
+         while (bvi.hasMoreElements())
             {
-            igNode = getNodeTable(colourableCursor);
+            igNode = getNodeTable(bvi.getNextElement());
 
             if (debug("traceIG"))
                {
-               diagnostic("SIMPLIFY: Selected colourable IG node #%d with degree %d: (igNode=%p, entity=%p)\n",
+               diagnostic(comp(), "SIMPLIFY: Selected colourable IG node #%d with degree %d: (igNode=%p, entity=%p)\n",
                            igNode->getIndex(), igNode->getWorkingDegree(), igNode, igNode->getEntity());
                }
 
             virtualRemoveNodeFromIG(igNode);
-            workingSet[igNode->getIndex()] = 0;
+            workingSet->reset(igNode->getIndex());
             getNodeStack()->push(igNode);
             }
 
@@ -394,11 +400,12 @@ bool TR_InterferenceGraph::simplify()
       // There are no nodes left in the colourable set.  Choose a spill candidate among nodes in
       // the non-colourable degree set.
       //
-      TR_ASSERT(!notColourableDegreeSet.IsZero(),
+      TR_ASSERT(!notColourableDegreeSet->isEmpty(),
              "not colourable set must contain at least one member\n");
 
-      CS2::ABitVector<TR::Allocator>::Cursor notColourableCursor(notColourableDegreeSet);
-      if (!notColourableDegreeSet.IsZero())
+      //CS2::ABitVector<TR::Allocator>::Cursor notColourableCursor(notColourableDegreeSet);
+      TR_BitVectorIterator bvi;
+      if (!notColourableDegreeSet->isEmpty())
          {
          // Choose the node from this degree set with the largest degree
          // and optimistically push it onto the stack.
@@ -406,9 +413,9 @@ bool TR_InterferenceGraph::simplify()
          int32_t degree = -1;
 
          bestSpillNode = NULL;
-         for(notColourableCursor.SetToFirstOne(); notColourableCursor.Valid(); notColourableCursor.SetToNextOne())
+         while (bvi.hasMoreElements())
             {
-            igNode = getNodeTable(notColourableCursor);
+            igNode = getNodeTable(bvi.getNextElement());
             if (igNode->getDegree() > degree)
                {
                degree = igNode->getDegree();
@@ -419,7 +426,7 @@ bool TR_InterferenceGraph::simplify()
          TR_ASSERT(bestSpillNode, "Could not find a spill candidate.\n");
 
          virtualRemoveNodeFromIG(bestSpillNode);
-         workingSet[bestSpillNode->getIndex()] = 0;
+         workingSet->reset(bestSpillNode->getIndex());
          getNodeStack()->push(bestSpillNode);
          }
       }
@@ -435,10 +442,13 @@ bool TR_InterferenceGraph::select()
    TR_IGNode            *igNode;
    TR_BitVectorIterator  bvi;
 
-   CS2::ABitVector<TR::Allocator> availableColours(comp()->allocator());
-   CS2::ABitVector<TR::Allocator> assignedColours(comp()->allocator());
-   availableColours.GrowTo(getNumColours());
-   assignedColours.GrowTo(getNumColours());
+   //CS2::ABitVector<TR::Allocator> availableColours(comp()->allocator());
+   //CS2::ABitVector<TR::Allocator> assignedColours(comp()->allocator());
+   //availableColours.GrowTo(getNumColours());
+   //assignedColours.GrowTo(getNumColours());
+
+   TR_BitVector *availableColours = new (trStackMemory()) TR_BitVector(getNumColours(), trMemory(), stackAlloc);
+   TR_BitVector *assignedColours = new (trStackMemory()) TR_BitVector(getNumColours(), trMemory(), stackAlloc);
 
    setNumberOfColoursUsedToColour(0);
 
@@ -446,7 +456,7 @@ bool TR_InterferenceGraph::select()
       {
       igNode = getNodeStack()->pop();
 
-      availableColours.SetAll(getNumColours());
+      availableColours->setAll(getNumColours());
 
       ListIterator<TR_IGNode> iterator(&igNode->getAdjList());
       TR_IGNode *adjCursor = iterator.getFirst();
@@ -455,7 +465,7 @@ bool TR_InterferenceGraph::select()
          {
          if (adjCursor->getColour() != UNCOLOURED)
             {
-            availableColours[adjCursor->getColour()] = 0;
+            availableColours->reset(adjCursor->getColour());
             }
 
          adjCursor = iterator.getNext();
@@ -463,21 +473,26 @@ bool TR_InterferenceGraph::select()
 
       if (debug("traceIG"))
          {
-         diagnostic("SELECT:  For IG node #%d (%p), available colours = ", igNode->getIndex(), igNode);
-         (*comp()) << availableColours;
-         diagnostic("\n");
+         diagnostic(comp(), "SELECT:  For IG node #%d (%p), available colours = ", igNode->getIndex(), igNode);
+         availableColours->print(_compilation);
+         diagnostic(comp(), "\n");
          }
 
-      if (!availableColours.IsZero())
+      bvi.setBitVector(*availableColours);
+
+      if (bvi.hasMoreElements())
          {
-         IGNodeColour colour = (IGNodeColour)availableColours.FirstOne();
+         IGNodeColour colour = (IGNodeColour)bvi.getNextElement();
          igNode->setColour(colour);
 
-         assignedColours[colour] = 1;
+         if (!assignedColours->isSet(colour))
+            {
+            assignedColours->set(colour);
+            }
 
          if (debug("traceIG"))
             {
-            diagnostic("         Selected colour: %d\n", colour);
+            diagnostic(comp(), "         Selected colour: %d\n", colour);
             }
          }
       else
@@ -493,7 +508,7 @@ bool TR_InterferenceGraph::select()
          }
       }
 
-  setNumberOfColoursUsedToColour(assignedColours.PopulationCount());
+   setNumberOfColoursUsedToColour(assignedColours->elementCount());
    return true;
    }
 
