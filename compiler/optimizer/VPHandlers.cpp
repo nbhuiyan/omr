@@ -5778,7 +5778,7 @@ TR::Node *constrainAcall(OMR::ValuePropagation *vp, TR::Node *node)
    constrainCall(vp, node);
 
    // Return if the node is not a call anymore
-   if (!node->getOpCode().isCall())
+   if (!node->getOpCode().isCall() || (node->getSymbolReference()->getSymbol()->castToMethodSymbol()->getRecognizedMethod() == TR::com_ibm_jit_JITHelpers_dispatchVirtual))
       return node;
 
    return vp->innerConstrainAcall(node);

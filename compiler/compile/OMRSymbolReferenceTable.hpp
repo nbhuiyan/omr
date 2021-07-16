@@ -443,7 +443,11 @@ class SymbolReferenceTable
        */
       j9VMThreadFloatTemp1Symbol,
 
-      OMRlastPrintableCommonNonhelperSymbol = j9VMThreadFloatTemp1Symbol,
+      J9JNIMethodIDvTableIndexFieldSymbol,
+
+      computedVirtualCallSymbol,
+
+      OMRlastPrintableCommonNonhelperSymbol = computedVirtualCallSymbol,
 
       firstPerCodeCacheHelperSymbol,
       lastPerCodeCacheHelperSymbol = firstPerCodeCacheHelperSymbol + TR_numCCPreLoadedCode - 1,
