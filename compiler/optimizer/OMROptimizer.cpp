@@ -517,6 +517,8 @@ static const OptimizationStrategy ilgenStrategyOpts[] = {
 #ifdef J9_PROJECT_SPECIFIC
     { osrLiveRangeAnalysis, IfOSR },
     { osrDefAnalysis, IfInvoluntaryOSR },
+    { invariantArgumentPreexistence,
+                              IfNotClassLoadPhaseAndNotProfiling }, // Should not run if a recompilation is possible
     {
                               methodHandleTransformer, },
     { varHandleTransformer, MustBeDone },
@@ -526,8 +528,6 @@ static const OptimizationStrategy ilgenStrategyOpts[] = {
     { coldBlockMarker },
     { CFGSimplification },
     { allocationSinking, IfNews },
-    { invariantArgumentPreexistence,
-                              IfNotClassLoadPhaseAndNotProfiling }, // Should not run if a recompilation is possible
 #endif
     { endOpts },
 };
