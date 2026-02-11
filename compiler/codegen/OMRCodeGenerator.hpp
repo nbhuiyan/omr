@@ -2258,7 +2258,6 @@ public:
 
     void assignKeepaliveConstRefLabels() {}
 
-#if defined(J9VM_OPT_OPENJDK_METHODHANDLE)
     TR::LabelSymbol *assignConstRefLabel(TR::KnownObjectTable::Index koi)
     {
         return assignConstRefLabelImpl(koi, false);
@@ -2268,7 +2267,6 @@ public:
     {
         return assignConstRefLabelImpl(koi, true);
     }
-#endif
 
     TR::LabelSymbol *getConstRefLabel(TR::KnownObjectTable::Index koi)
     {
@@ -2281,10 +2279,8 @@ public:
 
     const TR::vector<TR::KnownObjectTable::Index, TR::Region &> &getConstRefSortOrder() { return _constRefSortOrder; }
 
-#if defined(J9VM_OPT_OPENJDK_METHODHANDLE)
 private:
     TR::LabelSymbol *assignConstRefLabelImpl(TR::KnownObjectTable::Index koi, bool mustBeNew);
-#endif
 
 protected:
     enum // _flags1
