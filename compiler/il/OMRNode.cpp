@@ -3630,9 +3630,19 @@ void OMR::Node::setFlags(flags32_t f)
     self()->setHasNodeExtension(nodeExtensionExists);
 }
 
+namespace TR {
+void debugReportBadByteCodeIndex(int32_t i)
+{
+    TR_ASSERT_FATAL(false, "out-of-range byteCodeIndex written: %d (0x%08x)", i, (uint32_t)i);
+}
+} // namespace TR
+
 void OMR::Node::setByteCodeInfo(const TR_ByteCodeInfo &bcInfo)
 {
     _byteCodeInfo = bcInfo;
+    int32_t dbgBcIndex = _byteCodeInfo.getByteCodeIndex();
+    if (dbgBcIndex < -1 || dbgBcIndex > 0xFFFF)
+        TR::debugReportBadByteCodeIndex(dbgBcIndex);
     if (!TR::comp()->getCurrentIlGenerator())
         _byteCodeInfo.setDoNotProfile(1);
 }

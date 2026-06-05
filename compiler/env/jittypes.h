@@ -40,6 +40,9 @@
 #ifdef __cplusplus
 namespace TR {
 class Compilation;
+
+void debugReportBadByteCodeIndex(int32_t i);
+
 }
 
 /// This data type exists to refer class data which TR knows exists,
@@ -89,7 +92,11 @@ typedef struct TR_ByteCodeInfo {
 
     bool isInvalidCallerIndex() { return getCallerIndex() == invalidCallerIndex; }
 
-    void setByteCodeIndex(int32_t i) { _byteCodeIndex = i; }
+    void setByteCodeIndex(int32_t i){
+        if (i < -1 || i > 0xFFFF)
+            TR::debugReportBadByteCodeIndex(i);
+        _byteCodeIndex = i;
+    }
 
     int32_t getByteCodeIndex() const { return _byteCodeIndex; }
 
